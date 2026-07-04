@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../shared/constants/app_colors.dart';
-import '../../shared/constants/app_strings.dart';
 import '../../shared/widgets/app_logo.dart';
 
 /// The splash screen.
@@ -47,19 +46,9 @@ class _SplashBody extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           AppLogo(
-            size: 64,
+            size: 72,
             showLabel: true,
-            showTagline: false,
-          ),
-          SizedBox(height: 12),
-          Text(
-            AppStrings.splashTagline,
-            style: TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w400,
-              color: AppColors.textTertiary,
-              letterSpacing: 0.1,
-            ),
+            showTagline: true,
           ),
         ],
       ),

@@ -97,9 +97,9 @@ class _StreamSelector extends StatelessWidget {
       height: 44,
       padding: const EdgeInsets.all(3),
       decoration: BoxDecoration(
-        color: AppColors.cardBackground,
-        borderRadius: AppRadius.radiusMd,
-        border: Border.all(color: AppColors.border),
+        color: AppColors.cardBackgroundAlt,
+        borderRadius: AppRadius.radiusLg,
+        border: Border.all(color: AppColors.border, width: 0.75),
       ),
       child: Row(
         children: ExamStream.values.map((stream) {
@@ -195,8 +195,16 @@ class _SubjectCard extends StatelessWidget {
         padding: const EdgeInsets.all(AppSpacing.md),
         decoration: BoxDecoration(
           color: AppColors.cardBackground,
-          borderRadius: AppRadius.radiusLg,
-          border: Border.all(color: AppColors.border),
+          borderRadius: AppRadius.radiusXl,
+          border: Border.all(color: AppColors.border, width: 0.75),
+          boxShadow: const [
+            BoxShadow(
+              color: Color(0x08000000),
+              blurRadius: 10,
+              offset: Offset(0, 3),
+              spreadRadius: 0,
+            ),
+          ],
         ),
         child: Row(
           children: [

@@ -55,7 +55,8 @@ class _ChapterDashboardScreenState
     _allChapters = DummyChapters.forSubject(widget.subjectId);
     _subject = SubjectsData.findById(widget.subjectId);
     _searchController.addListener(() {
-      setState(() => _searchQuery = _searchController.text.trim().toLowerCase());
+      setState(
+          () => _searchQuery = _searchController.text.trim().toLowerCase());
     });
   }
 
@@ -185,8 +186,7 @@ class _ChapterDashboardScreenState
                       itemBuilder: (context, index) {
                         final chapter = filtered[index];
                         // Show original 1-based index for numbering
-                        final originalIndex =
-                            _allChapters.indexOf(chapter) + 1;
+                        final originalIndex = _allChapters.indexOf(chapter) + 1;
                         final progress = _progressFor(chapter.id);
                         return ChapterCard(
                           key: ValueKey(chapter.id),
@@ -280,9 +280,11 @@ class _SearchBar extends StatelessWidget {
         ),
         prefixIcon: const Padding(
           padding: EdgeInsets.symmetric(horizontal: AppSpacing.sm),
-          child: Icon(Icons.search_rounded, size: 18, color: AppColors.iconSecondary),
+          child: Icon(Icons.search_rounded,
+              size: 18, color: AppColors.iconSecondary),
         ),
-        prefixIconConstraints: const BoxConstraints(minWidth: 44, minHeight: 44),
+        prefixIconConstraints:
+            const BoxConstraints(minWidth: 44, minHeight: 44),
         suffixIcon: ValueListenableBuilder<TextEditingValue>(
           valueListenable: controller,
           builder: (_, value, __) {
@@ -304,16 +306,16 @@ class _SearchBar extends StatelessWidget {
           vertical: AppSpacing.sm,
         ),
         border: const OutlineInputBorder(
-          borderRadius: AppRadius.radiusMd,
+          borderRadius: AppRadius.radiusLg,
           borderSide: BorderSide(color: AppColors.border),
         ),
         enabledBorder: const OutlineInputBorder(
-          borderRadius: AppRadius.radiusMd,
+          borderRadius: AppRadius.radiusLg,
           borderSide: BorderSide(color: AppColors.border),
         ),
         focusedBorder: const OutlineInputBorder(
-          borderRadius: AppRadius.radiusMd,
-          borderSide: BorderSide(color: AppColors.borderFocused, width: 1.5),
+          borderRadius: AppRadius.radiusLg,
+          borderSide: BorderSide(color: AppColors.borderFocused, width: 2),
         ),
       ),
     );
@@ -346,10 +348,12 @@ class _FilterChips extends StatelessWidget {
                   vertical: 6,
                 ),
                 decoration: BoxDecoration(
-                  color: isActive ? AppColors.primary : AppColors.cardBackground,
+                  color:
+                      isActive ? AppColors.primary : AppColors.cardBackground,
                   borderRadius: AppRadius.radiusFull,
                   border: Border.all(
                     color: isActive ? AppColors.primary : AppColors.border,
+                    width: isActive ? 1.5 : 0.75,
                   ),
                 ),
                 child: Text(

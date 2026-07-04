@@ -9,10 +9,17 @@ abstract final class AppColors {
   static const Color primaryDark = Color(0xFF1D4ED8);
 
   // ── Surface ───────────────────────────────────────────────────────────────
-  static const Color background = Color(0xFFFFFFFF);
-  static const Color surface = Color(0xFFFFFFFF);
-  static const Color cardBackground = Color(0xFFF8FAFC);
-  static const Color cardBackgroundAlt = Color(0xFFF1F5F9);
+  /// Main scaffold background — calm off-white, avoids harsh pure white.
+  static const Color background = Color(0xFFF7F8FA);
+
+  /// Secondary surface for elevated elements (modal sheets, overlays).
+  static const Color surface = Color(0xFFFCFCFD);
+
+  /// Card background — slightly warmer to lift off the background.
+  static const Color cardBackground = Color(0xFFFFFFFF);
+
+  /// Alternative card background for subtle visual grouping.
+  static const Color cardBackgroundAlt = Color(0xFFF4F6F9);
 
   // ── Text ──────────────────────────────────────────────────────────────────
   static const Color textPrimary = Color(0xFF111827);
@@ -21,7 +28,10 @@ abstract final class AppColors {
   static const Color textOnPrimary = Color(0xFFFFFFFF);
 
   // ── Border ────────────────────────────────────────────────────────────────
-  static const Color border = Color(0xFFE5E7EB);
+  /// Default subtle border — softer than before for a more premium feel.
+  static const Color border = Color(0xFFE8ECF0);
+
+  /// Focused input border.
   static const Color borderFocused = Color(0xFF2563EB);
 
   // ── Status ────────────────────────────────────────────────────────────────
@@ -33,14 +43,18 @@ abstract final class AppColors {
   static const Color warningLight = Color(0xFFFFFBEB);
 
   // ── Progress ──────────────────────────────────────────────────────────────
-  static const Color progressTrack = Color(0xFFE5E7EB);
+  static const Color progressTrack = Color(0xFFEDF0F3);
 
   // ── Divider ───────────────────────────────────────────────────────────────
-  static const Color divider = Color(0xFFF3F4F6);
+  static const Color divider = Color(0xFFF0F2F5);
 
   // ── Icon ──────────────────────────────────────────────────────────────────
   static const Color iconPrimary = Color(0xFF374151);
   static const Color iconSecondary = Color(0xFF9CA3AF);
+
+  // ── Navigation bar ────────────────────────────────────────────────────────
+  /// Floating nav bar surface — white with very slight warmth.
+  static const Color navBarSurface = Color(0xFFFFFFFF);
 
   // ── Subject accent colors (for cards) ────────────────────────────────────
   static const Color physicsAccent = Color(0xFF2563EB);

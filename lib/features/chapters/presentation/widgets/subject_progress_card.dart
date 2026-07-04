@@ -29,8 +29,22 @@ class SubjectProgressCard extends StatelessWidget {
       padding: const EdgeInsets.all(AppSpacing.xl),
       decoration: BoxDecoration(
         color: AppColors.cardBackground,
-        borderRadius: AppRadius.radiusXl,
-        border: Border.all(color: AppColors.border),
+        borderRadius: AppRadius.radiusXxl,
+        border: Border.all(color: AppColors.border, width: 0.75),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x0C000000),
+            blurRadius: 16,
+            offset: Offset(0, 4),
+            spreadRadius: 0,
+          ),
+          BoxShadow(
+            color: Color(0x06000000),
+            blurRadius: 4,
+            offset: Offset(0, 1),
+            spreadRadius: 0,
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

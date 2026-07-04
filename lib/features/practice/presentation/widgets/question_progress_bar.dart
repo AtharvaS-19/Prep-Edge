@@ -57,8 +57,7 @@ class QuestionProgressBar extends StatelessWidget {
             value: _progress,
             minHeight: 4,
             backgroundColor: AppColors.progressTrack,
-            valueColor:
-                const AlwaysStoppedAnimation<Color>(AppColors.primary),
+            valueColor: const AlwaysStoppedAnimation<Color>(AppColors.primary),
           ),
         ),
       ],

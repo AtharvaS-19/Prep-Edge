@@ -40,8 +40,7 @@ abstract final class DummyQuestions {
           'A ball is thrown vertically upward with a speed of 20 m/s. The time taken to return to the point of projection is: (g = 10 m/s²)',
       options: ['2 s', '4 s', '1 s', '3 s'],
       correctOptionIndex: 1,
-      explanation:
-          'Total time of flight T = 2u/g = 2 × 20 / 10 = 4 s. '
+      explanation: 'Total time of flight T = 2u/g = 2 × 20 / 10 = 4 s. '
           'The ball takes 2 s to reach the top and 2 s to return.',
       source: ExamSource.jeeMain,
       year: 2021,
@@ -52,8 +51,7 @@ abstract final class DummyQuestions {
           'Two cars A and B are travelling in the same direction. Car A is 200 m ahead of car B. Both are moving at 72 km/h. Car A decelerates at 2 m/s² while B continues at constant speed. The time after which car B catches car A is:',
       options: ['10 s', '20 s', '15 s', '25 s'],
       correctOptionIndex: 1,
-      explanation:
-          'Relative initial velocity = 0 (both at 72 km/h = 20 m/s). '
+      explanation: 'Relative initial velocity = 0 (both at 72 km/h = 20 m/s). '
           'Relative acceleration of B w.r.t. A = 0 − (−2) = 2 m/s². '
           'Using s = ut + ½at²: 200 = 0 + ½ × 2 × t² → t = √200 ≈ 14.1 s. '
           'However, A stops at t = 10 s, after travelling 100 m. '
@@ -69,8 +67,7 @@ abstract final class DummyQuestions {
           'A projectile is fired at 30° to the horizontal. The vertical component of its velocity is 20 m/s. The total speed of the projectile at launch is: (sin 30° = 0.5)',
       options: ['20 m/s', '40 m/s', '10 m/s', '80 m/s'],
       correctOptionIndex: 1,
-      explanation:
-          'Vertical component v_y = v sin θ. '
+      explanation: 'Vertical component v_y = v sin θ. '
           '20 = v × sin 30° = v × 0.5. '
           'Therefore v = 40 m/s.',
       source: ExamSource.jeeMain,
@@ -100,8 +97,7 @@ abstract final class DummyQuestions {
         'βT / (α + β)',
       ],
       correctOptionIndex: 0,
-      explanation:
-          'Let t₁ be the time of acceleration and t₂ of deceleration. '
+      explanation: 'Let t₁ be the time of acceleration and t₂ of deceleration. '
           'v_max = αt₁ = βt₂ and t₁ + t₂ = T. '
           'Solving: t₁ = βT/(α+β), so v_max = αβT/(α+β).',
       source: ExamSource.jeeAdvanced,
@@ -147,8 +143,7 @@ abstract final class DummyQuestions {
           'A block of mass 5 kg is placed on a rough surface. A horizontal force of 20 N is applied. If μ = 0.3 and g = 10 m/s², the acceleration of the block is:',
       options: ['1 m/s²', '0.5 m/s²', '4 m/s²', '2.5 m/s²'],
       correctOptionIndex: 0,
-      explanation:
-          'Normal force N = mg = 50 N. Friction f = μN = 15 N. '
+      explanation: 'Normal force N = mg = 50 N. Friction f = μN = 15 N. '
           'Net force = 20 − 15 = 5 N. '
           'Acceleration a = F/m = 5/5 = 1 m/s².',
       source: ExamSource.jeeMain,
@@ -160,8 +155,7 @@ abstract final class DummyQuestions {
           'A 10 kg block rests on a 5 kg block on a frictionless surface. The coefficient of friction between the blocks is 0.2. The maximum force that can be applied to the lower block without the upper block slipping is: (g = 10 m/s²)',
       options: ['10 N', '20 N', '30 N', '15 N'],
       correctOptionIndex: 2,
-      explanation:
-          'Max friction on upper block = μmg = 0.2 × 10 × 10 = 20 N. '
+      explanation: 'Max friction on upper block = μmg = 0.2 × 10 × 10 = 20 N. '
           'Max acceleration of upper block = 20/10 = 2 m/s². '
           'For system together, F = (10+5) × 2 = 30 N.',
       source: ExamSource.jeeAdvanced,
@@ -207,8 +201,7 @@ abstract final class DummyQuestions {
         'Different bodies but only when they are in contact',
       ],
       correctOptionIndex: 1,
-      explanation:
-          'Action-reaction pairs always act on two different bodies. '
+      explanation: 'Action-reaction pairs always act on two different bodies. '
           'They are equal in magnitude, opposite in direction, and of the same type.',
       source: ExamSource.jeeMain,
       year: 2018,
@@ -223,8 +216,7 @@ abstract final class DummyQuestions {
           'A body of mass 2 kg is thrown upward with kinetic energy of 490 J. The height it will reach is: (g = 10 m/s²)',
       options: ['24.5 m', '49 m', '98 m', '12.25 m'],
       correctOptionIndex: 0,
-      explanation:
-          'KE = mgh → h = KE/(mg) = 490/(2 × 10) = 24.5 m.',
+      explanation: 'KE = mgh → h = KE/(mg) = 490/(2 × 10) = 24.5 m.',
       source: ExamSource.jeeMain,
       year: 2021,
     ),
@@ -234,8 +226,7 @@ abstract final class DummyQuestions {
           'A spring with spring constant 200 N/m is compressed by 0.1 m. The potential energy stored is:',
       options: ['1 J', '2 J', '0.5 J', '4 J'],
       correctOptionIndex: 0,
-      explanation:
-          'PE = ½kx² = ½ × 200 × (0.1)² = ½ × 200 × 0.01 = 1 J.',
+      explanation: 'PE = ½kx² = ½ × 200 × (0.1)² = ½ × 200 × 0.01 = 1 J.',
       source: ExamSource.jeeMain,
       year: 2020,
     ),
@@ -249,28 +240,24 @@ abstract final class DummyQuestions {
           'A stone is thrown vertically upward with initial velocity 20 m/s. The maximum height reached is: (g = 10 m/s²)',
       options: ['10 m', '20 m', '40 m', '5 m'],
       correctOptionIndex: 1,
-      explanation:
-          'At maximum height, v = 0. Using v² = u² − 2gh: '
+      explanation: 'At maximum height, v = 0. Using v² = u² − 2gh: '
           '0 = 400 − 2 × 10 × h → h = 20 m.',
       source: ExamSource.neet,
       year: 2022,
     ),
     Question(
       id: 'mp01_q02',
-      text:
-          'The area under a velocity-time graph gives:',
+      text: 'The area under a velocity-time graph gives:',
       options: ['Acceleration', 'Displacement', 'Speed', 'Force'],
       correctOptionIndex: 1,
-      explanation:
-          'The area under a v-t graph = ∫v dt = displacement. '
+      explanation: 'The area under a v-t graph = ∫v dt = displacement. '
           'The slope of a v-t graph gives acceleration.',
       source: ExamSource.neet,
       year: 2021,
     ),
     Question(
       id: 'mp01_q03',
-      text:
-          'A body is moving with uniform velocity. Which statement is true?',
+      text: 'A body is moving with uniform velocity. Which statement is true?',
       options: [
         'Net force is acting on the body',
         'The body is accelerating',
@@ -305,8 +292,7 @@ abstract final class DummyQuestions {
           'The number of moles of electrons in 96500 C of charge is: (Faraday constant = 96500 C/mol)',
       options: ['0.5 mol', '1 mol', '2 mol', '96500 mol'],
       correctOptionIndex: 1,
-      explanation:
-          '1 Faraday = 96500 C = charge of 1 mole of electrons. '
+      explanation: '1 Faraday = 96500 C = charge of 1 mole of electrons. '
           'Therefore 96500 C corresponds to exactly 1 mole of electrons.',
       source: ExamSource.jeeMain,
       year: 2021,
@@ -346,8 +332,7 @@ abstract final class DummyQuestions {
   static const List<Question> _setsMaths = [
     Question(
       id: 'em01_q01',
-      text:
-          'If A = {1, 2, 3} and B = {2, 3, 4}, then A ∩ B is:',
+      text: 'If A = {1, 2, 3} and B = {2, 3, 4}, then A ∩ B is:',
       options: ['{1, 2, 3, 4}', '{2, 3}', '{1, 4}', '{1, 2, 3}'],
       correctOptionIndex: 1,
       explanation:
@@ -358,8 +343,7 @@ abstract final class DummyQuestions {
     ),
     Question(
       id: 'em01_q02',
-      text:
-          'The number of subsets of a set with n elements is:',
+      text: 'The number of subsets of a set with n elements is:',
       options: ['n²', '2n', 'n!', '2ⁿ'],
       correctOptionIndex: 3,
       explanation:
@@ -370,8 +354,7 @@ abstract final class DummyQuestions {
     ),
     Question(
       id: 'em01_q03',
-      text:
-          'A relation R on set A is called symmetric if:',
+      text: 'A relation R on set A is called symmetric if:',
       options: [
         '(a, b) ∈ R implies (b, a) ∉ R',
         '(a, b) ∈ R implies (b, a) ∈ R',
@@ -379,8 +362,7 @@ abstract final class DummyQuestions {
         '(a, b) ∈ R and (b, c) ∈ R implies (a, c) ∈ R',
       ],
       correctOptionIndex: 1,
-      explanation:
-          'Symmetric: if (a, b) ∈ R then (b, a) ∈ R. '
+      explanation: 'Symmetric: if (a, b) ∈ R then (b, a) ∈ R. '
           'Reflexive: (a, a) ∈ R for all a. '
           'Transitive: (a,b) ∈ R and (b,c) ∈ R → (a,c) ∈ R.',
       source: ExamSource.jeeMain,
@@ -421,8 +403,7 @@ abstract final class DummyQuestions {
     ),
     Question(
       id: 'mb01_q03',
-      text:
-          'Binomial nomenclature was introduced by:',
+      text: 'Binomial nomenclature was introduced by:',
       options: ['Darwin', 'Mendel', 'Linnaeus', 'Lamarck'],
       correctOptionIndex: 2,
       explanation:

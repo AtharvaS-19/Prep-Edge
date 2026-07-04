@@ -27,11 +27,12 @@ class ExplanationCard extends StatelessWidget {
       padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
         color: _isCorrect ? AppColors.successLight : AppColors.errorLight,
-        borderRadius: AppRadius.radiusLg,
+        borderRadius: AppRadius.radiusXl,
         border: Border.all(
           color: _isCorrect
-              ? AppColors.success.withValues(alpha: 0.3)
-              : AppColors.error.withValues(alpha: 0.3),
+              ? AppColors.success.withValues(alpha: 0.25)
+              : AppColors.error.withValues(alpha: 0.25),
+          width: 0.75,
         ),
       ),
       child: Column(
@@ -41,9 +42,7 @@ class ExplanationCard extends StatelessWidget {
           Row(
             children: [
               Icon(
-                _isCorrect
-                    ? Icons.check_circle_rounded
-                    : Icons.cancel_rounded,
+                _isCorrect ? Icons.check_circle_rounded : Icons.cancel_rounded,
                 size: 18,
                 color: _isCorrect ? AppColors.success : AppColors.error,
               ),

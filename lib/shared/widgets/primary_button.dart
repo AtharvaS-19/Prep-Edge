@@ -36,8 +36,9 @@ class PrimaryButton extends StatelessWidget {
             width: 20,
             height: 20,
             child: CircularProgressIndicator(
-              strokeWidth: 2,
-              valueColor: AlwaysStoppedAnimation<Color>(AppColors.textOnPrimary),
+              strokeWidth: 2.5,
+              valueColor:
+                  AlwaysStoppedAnimation<Color>(AppColors.textOnPrimary),
             ),
           )
         : Row(
@@ -50,36 +51,38 @@ class PrimaryButton extends StatelessWidget {
               Text(
                 label,
                 style: const TextStyle(
+                  fontFamily: 'Inter',
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
                   color: AppColors.textOnPrimary,
-                  letterSpacing: -0.1,
+                  letterSpacing: -0.2,
                 ),
               ),
             ],
           );
 
-    final button = SizedBox(
+    return SizedBox(
       height: AppSpacing.buttonHeight,
       width: isFullWidth ? double.infinity : null,
       child: ElevatedButton(
         onPressed: isDisabled ? null : onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor:
-              isDisabled ? AppColors.primary.withValues(alpha: 0.5) : AppColors.primary,
+          backgroundColor: isDisabled
+              ? AppColors.primary.withValues(alpha: 0.5)
+              : AppColors.primary,
           disabledBackgroundColor: AppColors.primary.withValues(alpha: 0.5),
           foregroundColor: AppColors.textOnPrimary,
           elevation: 0,
           shadowColor: Colors.transparent,
+          // Slightly more generous corner radius than the theme default
+          // for the standalone CTA button treatment.
           shape: const RoundedRectangleBorder(
-            borderRadius: AppRadius.radiusMd,
+            borderRadius: AppRadius.radiusLg,
           ),
           padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
         ),
         child: buttonChild,
       ),
     );
-
-    return button;
   }
 }

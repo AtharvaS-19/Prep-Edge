@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 import '../constants/app_colors.dart';
-import '../constants/app_radius.dart';
 import '../constants/app_spacing.dart';
 import '../constants/app_strings.dart';
 
 /// The brand mark for the app.
 ///
-/// [size] controls the icon container size.
-/// [showLabel] adds the app name below the mark.
-/// [showTagline] adds the tagline below the name (only shown if [showLabel] is true).
+/// [size] controls the icon container size (applied to both width and height).
+/// [showLabel] adds the "PrepEdge" wordmark text below the icon.
+/// [showTagline] adds the tagline below the name (only when [showLabel] is true).
+///
+/// Uses the real `assets/branding/logo_icon.png` asset.
+/// Every screen that renders AppLogo automatically inherits the real brand.
 class AppLogo extends StatelessWidget {
   const AppLogo({
     super.key,
@@ -26,7 +28,15 @@ class AppLogo extends StatelessWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        _LogoMark(size: size),
+        // Real brand icon — swapped from placeholder Container
+        Image.asset(
+          'assets/branding/logo_icon.png',
+          width: size,
+          height: size,
+          fit: BoxFit.contain,
+          // Graceful fallback while asset loads or if path is wrong in a test
+          errorBuilder: (_, __, ___) => _LogoMarkFallback(size: size),
+        ),
         if (showLabel) ...[
           const SizedBox(height: AppSpacing.sm),
           Text(
@@ -56,9 +66,11 @@ class AppLogo extends StatelessWidget {
   }
 }
 
-/// The square icon mark — a stylised "P" letterform on the brand blue.
-class _LogoMark extends StatelessWidget {
-  const _LogoMark({required this.size});
+/// Fallback rendered only when the image asset cannot be loaded
+/// (e.g. in unit-test environments without asset bundles).
+/// Matches the original placeholder visual so tests don't break.
+class _LogoMarkFallback extends StatelessWidget {
+  const _LogoMarkFallback({required this.size});
 
   final double size;
 
@@ -67,9 +79,9 @@ class _LogoMark extends StatelessWidget {
     return Container(
       width: size,
       height: size,
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: AppColors.primary,
-        borderRadius: AppRadius.radiusMd,
+        borderRadius: BorderRadius.circular(size * 0.214), // ≈ radiusMd ratio
       ),
       child: Center(
         child: Text(

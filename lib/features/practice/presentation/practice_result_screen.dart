@@ -124,10 +124,11 @@ class PracticeResultScreen extends StatelessWidget {
                   '/subjects/$subjectId/chapters/$chapterId/practice',
                 ),
                 style: OutlinedButton.styleFrom(
-                  minimumSize: const Size(double.infinity, AppSpacing.buttonHeight),
+                  minimumSize:
+                      const Size(double.infinity, AppSpacing.buttonHeight),
                   side: const BorderSide(color: AppColors.border),
                   shape: const RoundedRectangleBorder(
-                    borderRadius: AppRadius.radiusMd,
+                    borderRadius: AppRadius.radiusLg,
                   ),
                 ),
                 child: const Text(
@@ -175,8 +176,16 @@ class _ScoreCard extends StatelessWidget {
       padding: const EdgeInsets.all(AppSpacing.xl),
       decoration: BoxDecoration(
         color: AppColors.cardBackground,
-        borderRadius: AppRadius.radiusXl,
-        border: Border.all(color: AppColors.border),
+        borderRadius: AppRadius.radiusXxl,
+        border: Border.all(color: AppColors.border, width: 0.75),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x0C000000),
+            blurRadius: 16,
+            offset: Offset(0, 4),
+            spreadRadius: 0,
+          ),
+        ],
       ),
       child: Column(
         children: [
@@ -257,8 +266,16 @@ class _MiniStatCard extends StatelessWidget {
       ),
       decoration: BoxDecoration(
         color: AppColors.cardBackground,
-        borderRadius: AppRadius.radiusLg,
-        border: Border.all(color: AppColors.border),
+        borderRadius: AppRadius.radiusXl,
+        border: Border.all(color: AppColors.border, width: 0.75),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x08000000),
+            blurRadius: 10,
+            offset: Offset(0, 3),
+            spreadRadius: 0,
+          ),
+        ],
       ),
       child: Column(
         children: [

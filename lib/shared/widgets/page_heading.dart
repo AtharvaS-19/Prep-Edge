@@ -4,7 +4,8 @@ import '../constants/app_spacing.dart';
 
 /// Reusable page title + subtitle block used at the top of auth screens.
 ///
-/// Renders a large [title] and a smaller [subtitle] below it.
+/// Renders a large welcoming [title] and a comfortable [subtitle] below it.
+/// The increased size and tighter tracking create a premium editorial feel.
 class PageHeading extends StatelessWidget {
   const PageHeading({
     super.key,
@@ -24,22 +25,25 @@ class PageHeading extends StatelessWidget {
         Text(
           title,
           style: const TextStyle(
-            fontSize: 28,
+            fontFamily: 'Inter',
+            fontSize: 30,
             fontWeight: FontWeight.w700,
             color: AppColors.textPrimary,
-            letterSpacing: -0.75,
-            height: 1.2,
+            letterSpacing: -0.9,
+            height: 1.15,
           ),
         ),
         if (subtitle != null) ...[
-          const SizedBox(height: AppSpacing.xs),
+          const SizedBox(height: AppSpacing.sm),
           Text(
             subtitle!,
             style: const TextStyle(
-              fontSize: 15,
+              fontFamily: 'Inter',
+              fontSize: 16,
               fontWeight: FontWeight.w400,
               color: AppColors.textSecondary,
               height: 1.5,
+              letterSpacing: -0.1,
             ),
           ),
         ],

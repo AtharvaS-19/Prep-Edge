@@ -26,7 +26,6 @@ class BookmarkNotifier extends StateNotifier<List<String>> {
 /// Consumed by:
 ///  - [PracticeScreen] — to toggle + read bookmark state per question
 ///  - [BookmarksScreen] — to resolve and display all bookmarked questions
-final bookmarkProvider =
-    StateNotifierProvider<BookmarkNotifier, List<String>>(
+final bookmarkProvider = StateNotifierProvider<BookmarkNotifier, List<String>>(
   (_) => BookmarkNotifier(),
 );

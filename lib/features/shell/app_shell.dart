@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../shared/constants/app_colors.dart';
+import '../../shared/constants/app_radius.dart';
+import '../../shared/constants/app_spacing.dart';
 
 /// The persistent application shell.
 ///
 /// Rendered once for the lifetime of the app session. GoRouter's [ShellRoute]
 /// swaps the [child] (the active tab's screen) while this scaffold and its
-/// [NavigationBar] remain mounted and never rebuild on tab switch.
+/// bottom navigation remain mounted and never rebuild on tab switch.
 ///
 /// State preservation: each tab's subtree stays alive via [IndexedStack],
 /// so scroll positions, form input, and local state survive tab switches.
@@ -80,8 +82,10 @@ class _AppShellState extends State<AppShell> {
 
     return Scaffold(
       backgroundColor: AppColors.background,
+      // extendBody allows the scroll content to flow behind the floating nav bar.
+      extendBody: true,
       body: widget.child,
-      bottomNavigationBar: _AppNavigationBar(
+      bottomNavigationBar: _FloatingNavBar(
         selectedIndex: _activeIndex,
         destinations: _destinations,
         onDestinationSelected: _onTabTapped,
@@ -90,10 +94,10 @@ class _AppShellState extends State<AppShell> {
   }
 }
 
-// ── Navigation bar ─────────────────────────────────────────────────────────────
+// ── Floating navigation bar ────────────────────────────────────────────────────
 
-class _AppNavigationBar extends StatelessWidget {
-  const _AppNavigationBar({
+class _FloatingNavBar extends StatelessWidget {
+  const _FloatingNavBar({
     required this.selectedIndex,
     required this.destinations,
     required this.onDestinationSelected,
@@ -105,35 +109,119 @@ class _AppNavigationBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return NavigationBar(
-      selectedIndex: selectedIndex,
-      onDestinationSelected: onDestinationSelected,
-      backgroundColor: AppColors.background,
-      surfaceTintColor: Colors.transparent,
-      shadowColor: Colors.transparent,
-      elevation: 0,
-      height: 64,
-      labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
-      indicatorColor: AppColors.primaryLight,
-      indicatorShape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.all(Radius.circular(10)),
+    // Bottom padding respects the system navigation bar / home indicator.
+    final double bottomInset = MediaQuery.of(context).padding.bottom;
+
+    return Padding(
+      padding: EdgeInsets.fromLTRB(
+        AppSpacing.md,
+        0,
+        AppSpacing.md,
+        (bottomInset > 0 ? bottomInset : AppSpacing.md) + AppSpacing.xs,
       ),
-      destinations: destinations.map((dest) {
-        return NavigationDestination(
-          icon: Icon(
-            dest.icon,
-            size: 22,
-            color: AppColors.textSecondary,
+      child: Container(
+        height: 68,
+        decoration: BoxDecoration(
+          color: AppColors.navBarSurface,
+          borderRadius: AppRadius.radiusXxl,
+          border: Border.all(
+            color: AppColors.border,
+            width: 1,
           ),
-          selectedIcon: Icon(
-            dest.selectedIcon,
-            size: 22,
-            color: AppColors.primary,
+          boxShadow: const [
+            BoxShadow(
+              color: Color(0x14000000), // ~8% black
+              blurRadius: 24,
+              offset: Offset(0, 8),
+              spreadRadius: 0,
+            ),
+            BoxShadow(
+              color: Color(0x0A000000), // ~4% black — secondary soft layer
+              blurRadius: 8,
+              offset: Offset(0, 2),
+              spreadRadius: 0,
+            ),
+          ],
+        ),
+        child: ClipRRect(
+          borderRadius: AppRadius.radiusXxl,
+          child: Row(
+            children: List.generate(destinations.length, (index) {
+              final dest = destinations[index];
+              final bool isSelected = index == selectedIndex;
+              return _NavBarItem(
+                destination: dest,
+                isSelected: isSelected,
+                onTap: () => onDestinationSelected(index),
+              );
+            }),
           ),
-          label: dest.label,
-          tooltip: dest.label,
-        );
-      }).toList(),
+        ),
+      ),
+    );
+  }
+}
+
+// ── Individual nav bar item ────────────────────────────────────────────────────
+
+class _NavBarItem extends StatelessWidget {
+  const _NavBarItem({
+    required this.destination,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  final _TabDestination destination;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final Color iconColor =
+        isSelected ? AppColors.primary : AppColors.textTertiary;
+    final Color labelColor =
+        isSelected ? AppColors.primary : AppColors.textTertiary;
+
+    return Expanded(
+      child: GestureDetector(
+        onTap: onTap,
+        behavior: HitTestBehavior.opaque,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // Selected indicator pill above icon
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 180),
+              curve: Curves.easeOut,
+              width: isSelected ? 32 : 0,
+              height: 3,
+              margin: const EdgeInsets.only(bottom: AppSpacing.xxs),
+              decoration: BoxDecoration(
+                color: isSelected ? AppColors.primary : Colors.transparent,
+                borderRadius: AppRadius.radiusFull,
+              ),
+            ),
+            Icon(
+              isSelected ? destination.selectedIcon : destination.icon,
+              size: 22,
+              color: iconColor,
+            ),
+            const SizedBox(height: 3),
+            Text(
+              destination.label,
+              style: TextStyle(
+                fontFamily: 'Inter',
+                fontSize: 10,
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+                color: labelColor,
+                letterSpacing: 0.1,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

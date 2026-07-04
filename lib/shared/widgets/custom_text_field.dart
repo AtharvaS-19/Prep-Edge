@@ -63,8 +63,9 @@ class _CustomTextFieldState extends State<CustomTextField> {
           Text(
             widget.labelText!,
             style: const TextStyle(
+              fontFamily: 'Inter',
               fontSize: 13,
-              fontWeight: FontWeight.w500,
+              fontWeight: FontWeight.w600,
               color: AppColors.textPrimary,
               letterSpacing: -0.1,
             ),
@@ -81,13 +82,16 @@ class _CustomTextFieldState extends State<CustomTextField> {
           readOnly: widget.readOnly,
           onTap: widget.onTap,
           style: const TextStyle(
+            fontFamily: 'Inter',
             fontSize: 15,
             fontWeight: FontWeight.w400,
             color: AppColors.textPrimary,
+            height: 1.5,
           ),
           decoration: InputDecoration(
             hintText: widget.hintText,
             hintStyle: const TextStyle(
+              fontFamily: 'Inter',
               fontSize: 15,
               fontWeight: FontWeight.w400,
               color: AppColors.textTertiary,
@@ -103,7 +107,8 @@ class _CustomTextFieldState extends State<CustomTextField> {
                     ),
                   )
                 : null,
-            prefixIconConstraints: const BoxConstraints(minWidth: 44, minHeight: 44),
+            prefixIconConstraints:
+                const BoxConstraints(minWidth: 44, minHeight: 48),
             suffixIcon: widget.obscureText
                 ? _PasswordToggle(
                     isObscured: _obscured,
@@ -112,29 +117,30 @@ class _CustomTextFieldState extends State<CustomTextField> {
                 : widget.suffixIcon,
             filled: true,
             fillColor: AppColors.cardBackground,
+            // Improved padding for premium appearance
             contentPadding: const EdgeInsets.symmetric(
               horizontal: AppSpacing.md,
-              vertical: AppSpacing.md,
+              vertical: AppSpacing.xl,
             ),
             border: const OutlineInputBorder(
-              borderRadius: AppRadius.radiusMd,
+              borderRadius: AppRadius.radiusLg,
               borderSide: BorderSide(color: AppColors.border, width: 1),
             ),
             enabledBorder: const OutlineInputBorder(
-              borderRadius: AppRadius.radiusMd,
+              borderRadius: AppRadius.radiusLg,
               borderSide: BorderSide(color: AppColors.border, width: 1),
             ),
             focusedBorder: const OutlineInputBorder(
-              borderRadius: AppRadius.radiusMd,
-              borderSide: BorderSide(color: AppColors.borderFocused, width: 1.5),
+              borderRadius: AppRadius.radiusLg,
+              borderSide: BorderSide(color: AppColors.borderFocused, width: 2),
             ),
             errorBorder: const OutlineInputBorder(
-              borderRadius: AppRadius.radiusMd,
+              borderRadius: AppRadius.radiusLg,
               borderSide: BorderSide(color: AppColors.error, width: 1),
             ),
             focusedErrorBorder: const OutlineInputBorder(
-              borderRadius: AppRadius.radiusMd,
-              borderSide: BorderSide(color: AppColors.error, width: 1.5),
+              borderRadius: AppRadius.radiusLg,
+              borderSide: BorderSide(color: AppColors.error, width: 2),
             ),
           ),
         ),

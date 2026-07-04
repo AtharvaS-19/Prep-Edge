@@ -49,8 +49,7 @@ class ChapterProgress {
     }
 
     final attempted = latestByQuestion.length;
-    final correct =
-        latestByQuestion.values.where((a) => a.isCorrect).length;
+    final correct = latestByQuestion.values.where((a) => a.isCorrect).length;
 
     return ChapterProgress(
       chapterId: chapterId,

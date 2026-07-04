@@ -25,6 +25,7 @@ class QuestionCard extends StatelessWidget {
   final int? selectedIndex;
   final bool isSubmitted;
   final ValueChanged<int> onOptionSelected;
+
   /// Whether this question is currently bookmarked.
   /// The bookmark toggle UI lives in [PracticeScreen]'s AppBar, not here.
   final bool isBookmarked;
@@ -50,9 +51,8 @@ class QuestionCard extends StatelessWidget {
         ...List.generate(question.options.length, (index) {
           return Padding(
             padding: EdgeInsets.only(
-              bottom: index < question.options.length - 1
-                  ? AppSpacing.cardGap
-                  : 0,
+              bottom:
+                  index < question.options.length - 1 ? AppSpacing.cardGap : 0,
             ),
             child: _OptionTile(
               index: index,
@@ -94,10 +94,13 @@ class _OptionTile extends StatelessWidget {
     if (!isSubmitted) {
       final bool isSelected = selectedIndex == index;
       return _OptionStyle(
-        background: isSelected ? AppColors.primaryLight : AppColors.cardBackground,
+        background:
+            isSelected ? AppColors.primaryLight : AppColors.cardBackground,
         border: isSelected ? AppColors.primary : AppColors.border,
-        labelBackground: isSelected ? AppColors.primary : AppColors.cardBackgroundAlt,
-        labelColor: isSelected ? AppColors.textOnPrimary : AppColors.textTertiary,
+        labelBackground:
+            isSelected ? AppColors.primary : AppColors.cardBackgroundAlt,
+        labelColor:
+            isSelected ? AppColors.textOnPrimary : AppColors.textTertiary,
         textColor: AppColors.textPrimary,
         borderWidth: isSelected ? 1.5 : 1.0,
       );
@@ -153,7 +156,7 @@ class _OptionTile extends StatelessWidget {
         padding: const EdgeInsets.all(AppSpacing.md),
         decoration: BoxDecoration(
           color: style.background,
-          borderRadius: AppRadius.radiusMd,
+          borderRadius: AppRadius.radiusLg,
           border: Border.all(color: style.border, width: style.borderWidth),
         ),
         child: Row(

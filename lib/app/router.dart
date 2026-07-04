@@ -93,7 +93,8 @@ final appRouter = GoRouter(
                     final subjectId = state.pathParameters['subjectId'] ?? '';
                     final chapterId = state.pathParameters['chapterId'] ?? '';
                     final extra = state.extra as Map<String, dynamic>?;
-                    final chapterTitle = extra?['chapterTitle'] as String? ?? '';
+                    final chapterTitle =
+                        extra?['chapterTitle'] as String? ?? '';
                     final total = extra?['total'] as int? ?? 0;
                     final correct = extra?['correct'] as int? ?? 0;
                     return PracticeResultScreen(

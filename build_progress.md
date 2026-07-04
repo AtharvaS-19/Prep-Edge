@@ -277,12 +277,45 @@
 - [x] `lib/features/practice/presentation/practice_result_screen.dart` — progress bar radius converted to `AppRadius.radiusFull` instead of raw circular value.
 - [x] `lib/features/progress/presentation/progress_screen.dart` — recently solved section refactored to look up and show truncated question text via `DummyQuestions` instead of raw ID strings, layout tweaked to align numbers and multi-line text nicely.
 
+## ✅ UI Redesign Sprint 1 — Foundation
+- [x] Refined the entire color palette in `app_colors.dart` with soft off-white `background` (#F7F8FA), `surface` (#FCFCFD), and softer neutrals.
+- [x] Updated spacing tokens in `app_spacing.dart` (increased `cardGap` to 16, `cardPadding` to 24, button heights to 58/46).
+- [x] Restyled `AppTheme` with `radiusXxl` cards, refined `InputDecoration` padding/radii, and adjusted typography line-heights/weights.
+- [x] Redesigned `app_shell.dart` to use a custom floating, pill-shaped `_FloatingNavBar` with soft shadows, an animated indicator pill, and enabled `extendBody: true`.
+- [x] Updated critical UI elements (`PageHeading`, `PrimaryButton`, `CustomTextField`, `ChapterCard`, `SubjectProgressCard`) to inherit design tokens.
+- [x] Updated card styles and layout elements in all screens (`HomeScreen`, `ProgressScreen`, `SubjectsScreen`, `BookmarksScreen`, `MistakesScreen`, `ChapterDashboardScreen`, `PracticeResultScreen`) to use the new premium card system.
+
+## ✅ UI Redesign Sprint 2 — Authentication Experience
+- [x] Redesigned Login and Signup screens with a premium, vertically balanced layout.
+- [x] Added a subtle background gradient to the off-white surface to build atmospheric depth.
+- [x] Wrapped the forms inside a floating premium card with `radiusXxl` (24dp), soft elevation, and 0.75px borders.
+- [x] Replaced the generic appbar with a custom overlay back button.
+- [x] Improved text field spacing and primary/secondary button layout and styling.
+
+## ✅ Brand Integration
+- [x] Nested `assets/branding/` asset path correctly inside `pubspec.yaml` under `flutter:`.
+- [x] Swapped out the placeholder `_LogoMark` inside `AppLogo` for the official brand logo icon (`logo_icon.png`).
+- [x] Set up an automated error fallback `_LogoMarkFallback` in `AppLogo` to support robust tests and developer environments.
+- [x] Center-aligned and scaled the new PrepEdge logo icon consistently inside Splash, Login, and Signup screens.
+
+## ✅ Brand Identity Review Pass
+- [x] Splash Screen: Increased logo size to 72dp, unified logo/app name/tagline in a single visual group via AppLogo, and removed the manual tagline text widget.
+- [x] Login & Signup Screens: Kept clean hierarchy, ensured logo and app name are visually connected (8dp spacing), and updated login subtitle copy to "Pick up where you left off."
+- [x] Home Screen: Introduced a compact 32dp icon-only logo next to the welcome greeting section as a subtle branding touch.
+- [x] Page Headers & Bottom Navigation: Ensured no logos are placed on Subjects, Practice, Progress, Bookmarks, and Mistakes screens to remain focused on learning.
+
+## ✅ UI Review Pass — Home Experience
+- [x] Reorganized Home Screen layout hierarchy: Greeting → Continue Learning → Today's Snapshot → Quick Actions → Insights → Subjects.
+- [x] Greeting: Strengthened typography, added motivational subtitle ("Consistency beats intensity.") next to the compact 32dp logo.
+- [x] Today's Snapshot: Created a 2x2 grid displaying Questions Attempted, Accuracy, Bookmarks, and Mistakes counts using real existing providers.
+- [x] Quick Actions & Subjects: Restructured positioning, adjusted margins/spacing, and elevated visual hierarchy of key elements.
+
 ---
 
 ## Current Task
-**Status:** Home Screen layout refined. Quick Actions moved up to improve high-frequency access hierarchy, preceding Insights and Subjects. Code remains clean, with no analyze warnings or lints.
+**Status:** UI Review Pass — Home Experience completed. Home screen restructured into a high-utility productivity dashboard.
 **Next file:** TBD
-**Last completed file:** `home_screen.dart` — Home Screen layout hierarchy refinement.
+**Last completed file:** `build_progress.md` — Updated progress documentation to include UI Review Pass — Home Experience.
 
 ---
 

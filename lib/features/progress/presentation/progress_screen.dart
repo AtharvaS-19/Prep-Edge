@@ -210,8 +210,16 @@ class _StatCard extends StatelessWidget {
       padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
         color: AppColors.cardBackground,
-        borderRadius: AppRadius.radiusLg,
-        border: Border.all(color: AppColors.border),
+        borderRadius: AppRadius.radiusXl,
+        border: Border.all(color: AppColors.border, width: 0.75),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x08000000),
+            blurRadius: 10,
+            offset: Offset(0, 3),
+            spreadRadius: 0,
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -289,8 +297,16 @@ class _SubjectProgressTile extends StatelessWidget {
       padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
         color: AppColors.cardBackground,
-        borderRadius: AppRadius.radiusLg,
-        border: Border.all(color: AppColors.border),
+        borderRadius: AppRadius.radiusXl,
+        border: Border.all(color: AppColors.border, width: 0.75),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x07000000),
+            blurRadius: 8,
+            offset: Offset(0, 2),
+            spreadRadius: 0,
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -337,8 +353,7 @@ class _SubjectProgressTile extends StatelessWidget {
               value: progress.completionPercentage,
               minHeight: 4,
               backgroundColor: AppColors.progressTrack,
-              valueColor:
-                  AlwaysStoppedAnimation<Color>(subject.accentColor),
+              valueColor: AlwaysStoppedAnimation<Color>(subject.accentColor),
             ),
           ),
           const SizedBox(height: AppSpacing.xs),
@@ -470,8 +485,16 @@ class _InsightTile extends StatelessWidget {
       ),
       decoration: BoxDecoration(
         color: AppColors.cardBackground,
-        borderRadius: AppRadius.radiusLg,
-        border: Border.all(color: AppColors.border),
+        borderRadius: AppRadius.radiusXl,
+        border: Border.all(color: AppColors.border, width: 0.75),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x07000000),
+            blurRadius: 8,
+            offset: Offset(0, 2),
+            spreadRadius: 0,
+          ),
+        ],
       ),
       child: Row(
         children: [
@@ -537,8 +560,7 @@ class _RecentlySolvedList extends StatelessWidget {
     return Column(
       children: [
         for (int i = 0; i < visible.length; i++) ...[
-          if (i > 0)
-            const Divider(height: 1, color: AppColors.divider),
+          if (i > 0) const Divider(height: 1, color: AppColors.divider),
           _RecentQuestionRow(questionId: visible[i], index: i + 1),
         ],
       ],

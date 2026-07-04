@@ -22,8 +22,7 @@ final progressStatsProvider = Provider<ProgressStats>((ref) {
 final chapterStatsProvider =
     Provider.family<ProgressStats, String>((ref, chapterId) {
   final attempts = ref.watch(learningProvider);
-  final filtered =
-      attempts.where((a) => a.chapterId == chapterId).toList();
+  final filtered = attempts.where((a) => a.chapterId == chapterId).toList();
   return ProgressStats.fromAttempts(filtered);
 });
 
@@ -33,8 +32,7 @@ final chapterStatsProvider =
 final subjectStatsProvider =
     Provider.family<ProgressStats, String>((ref, subjectId) {
   final attempts = ref.watch(learningProvider);
-  final filtered =
-      attempts.where((a) => a.subjectId == subjectId).toList();
+  final filtered = attempts.where((a) => a.subjectId == subjectId).toList();
   return ProgressStats.fromAttempts(filtered);
 });
 

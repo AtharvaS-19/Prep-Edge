@@ -52,8 +52,8 @@ final subjectProgressProvider =
 
   // Sum question counts across every chapter in this subject.
   // DummyChapters.forSubject returns [] for unrecognised IDs — safe default.
-  final totalQuestions = DummyChapters.forSubject(subjectId)
-      .fold<int>(0, (sum, chapter) {
+  final totalQuestions =
+      DummyChapters.forSubject(subjectId).fold<int>(0, (sum, chapter) {
     return sum + DummyQuestions.forChapter(chapter.id).length;
   });
 

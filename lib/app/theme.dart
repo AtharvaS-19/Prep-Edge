@@ -68,42 +68,52 @@ abstract final class AppTheme {
         fontWeight: FontWeight.w700,
         letterSpacing: -0.75,
         color: AppColors.textPrimary,
+        height: 1.2,
       ),
       headlineMedium: inter.headlineMedium?.copyWith(
         fontWeight: FontWeight.w700,
         letterSpacing: -0.5,
         color: AppColors.textPrimary,
+        height: 1.25,
       ),
       headlineSmall: inter.headlineSmall?.copyWith(
         fontWeight: FontWeight.w600,
-        letterSpacing: -0.25,
+        letterSpacing: -0.3,
         color: AppColors.textPrimary,
+        height: 1.3,
       ),
       titleLarge: inter.titleLarge?.copyWith(
         fontWeight: FontWeight.w600,
-        letterSpacing: -0.25,
+        letterSpacing: -0.3,
         color: AppColors.textPrimary,
+        height: 1.3,
       ),
       titleMedium: inter.titleMedium?.copyWith(
         fontWeight: FontWeight.w600,
-        letterSpacing: -0.15,
+        letterSpacing: -0.2,
         color: AppColors.textPrimary,
+        height: 1.4,
       ),
       titleSmall: inter.titleSmall?.copyWith(
         fontWeight: FontWeight.w500,
+        letterSpacing: -0.1,
         color: AppColors.textPrimary,
+        height: 1.4,
       ),
       bodyLarge: inter.bodyLarge?.copyWith(
         fontWeight: FontWeight.w400,
         color: AppColors.textPrimary,
+        height: 1.55,
       ),
       bodyMedium: inter.bodyMedium?.copyWith(
         fontWeight: FontWeight.w400,
         color: AppColors.textSecondary,
+        height: 1.5,
       ),
       bodySmall: inter.bodySmall?.copyWith(
         fontWeight: FontWeight.w400,
         color: AppColors.textTertiary,
+        height: 1.45,
       ),
       labelLarge: inter.labelLarge?.copyWith(
         fontWeight: FontWeight.w600,
@@ -138,7 +148,7 @@ abstract final class AppTheme {
       fontFamily: 'Inter',
       fontSize: 17,
       fontWeight: FontWeight.w600,
-      letterSpacing: -0.25,
+      letterSpacing: -0.3,
       color: AppColors.textPrimary,
     ),
     iconTheme: IconThemeData(
@@ -154,12 +164,13 @@ abstract final class AppTheme {
           backgroundColor: AppColors.primary,
           foregroundColor: AppColors.textOnPrimary,
           disabledBackgroundColor: AppColors.primary.withValues(alpha: 0.4),
-          disabledForegroundColor: AppColors.textOnPrimary.withValues(alpha: 0.6),
+          disabledForegroundColor:
+              AppColors.textOnPrimary.withValues(alpha: 0.6),
           elevation: 0,
           shadowColor: Colors.transparent,
           minimumSize: const Size(double.infinity, AppSpacing.buttonHeight),
           shape: const RoundedRectangleBorder(
-            borderRadius: AppRadius.radiusMd,
+            borderRadius: AppRadius.radiusLg,
           ),
           textStyle: const TextStyle(
             fontFamily: 'Inter',
@@ -175,10 +186,10 @@ abstract final class AppTheme {
       OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           foregroundColor: AppColors.textPrimary,
-          side: const BorderSide(color: AppColors.border, width: 1),
+          side: const BorderSide(color: AppColors.border, width: 1.5),
           minimumSize: const Size(double.infinity, AppSpacing.buttonHeight),
           shape: const RoundedRectangleBorder(
-            borderRadius: AppRadius.radiusMd,
+            borderRadius: AppRadius.radiusLg,
           ),
           textStyle: const TextStyle(
             fontFamily: 'Inter',
@@ -206,32 +217,34 @@ abstract final class AppTheme {
       );
 
   // ── Input decoration ───────────────────────────────────────────────────────
-  static InputDecorationTheme get _inputDecorationTheme => const InputDecorationTheme(
+  static InputDecorationTheme get _inputDecorationTheme =>
+      const InputDecorationTheme(
         filled: true,
         fillColor: AppColors.cardBackground,
         contentPadding: EdgeInsets.symmetric(
           horizontal: AppSpacing.md,
-          vertical: AppSpacing.md,
+          vertical: AppSpacing.lg, // More breathing room — was md
         ),
         border: OutlineInputBorder(
-          borderRadius: AppRadius.radiusMd,
+          borderRadius: AppRadius.radiusLg, // Was radiusMd
           borderSide: BorderSide(color: AppColors.border, width: 1),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: AppRadius.radiusMd,
+          borderRadius: AppRadius.radiusLg,
           borderSide: BorderSide(color: AppColors.border, width: 1),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: AppRadius.radiusMd,
-          borderSide: BorderSide(color: AppColors.borderFocused, width: 1.5),
+          borderRadius: AppRadius.radiusLg,
+          borderSide:
+              BorderSide(color: AppColors.borderFocused, width: 2), // Was 1.5
         ),
         errorBorder: OutlineInputBorder(
-          borderRadius: AppRadius.radiusMd,
+          borderRadius: AppRadius.radiusLg,
           borderSide: BorderSide(color: AppColors.error, width: 1),
         ),
         focusedErrorBorder: OutlineInputBorder(
-          borderRadius: AppRadius.radiusMd,
-          borderSide: BorderSide(color: AppColors.error, width: 1.5),
+          borderRadius: AppRadius.radiusLg,
+          borderSide: BorderSide(color: AppColors.error, width: 2),
         ),
         hintStyle: TextStyle(
           fontFamily: 'Inter',
@@ -248,12 +261,15 @@ abstract final class AppTheme {
       );
 
   // ── Card ───────────────────────────────────────────────────────────────────
+  /// Cards float gently above the background using a soft shadow and border.
+  /// Elevation is intentionally kept at 0 — shadow is applied via BoxDecoration
+  /// in the card widgets themselves for finer control.
   static const CardThemeData _cardTheme = CardThemeData(
     color: AppColors.cardBackground,
     elevation: 0,
     margin: EdgeInsets.zero,
     shape: RoundedRectangleBorder(
-      borderRadius: AppRadius.radiusLg,
+      borderRadius: AppRadius.radiusXl, // Was radiusLg
     ),
   );
 
@@ -269,7 +285,7 @@ abstract final class AppTheme {
       ProgressIndicatorThemeData(
     color: AppColors.primary,
     linearTrackColor: AppColors.progressTrack,
-    linearMinHeight: 6,
+    linearMinHeight: 5, // Slightly slimmer for a premium look
   );
 
   // Prevent instantiation

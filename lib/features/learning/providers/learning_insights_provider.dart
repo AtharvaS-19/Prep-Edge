@@ -86,9 +86,7 @@ final mostPracticedChapterProvider = Provider<String?>((ref) {
     counts[a.chapterId] = (counts[a.chapterId] ?? 0) + 1;
   }
 
-  return counts.entries
-      .reduce((a, b) => a.value >= b.value ? a : b)
-      .key;
+  return counts.entries.reduce((a, b) => a.value >= b.value ? a : b).key;
 });
 
 // ── Recently completed questions ──────────────────────────────────────────────

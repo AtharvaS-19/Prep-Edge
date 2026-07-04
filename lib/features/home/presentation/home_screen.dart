@@ -4,18 +4,20 @@ import 'package:go_router/go_router.dart';
 import '../../subjects/data/subjects_data.dart';
 import '../../subjects/models/subject_model.dart';
 import '../../chapters/data/dummy_chapters.dart';
+import '../../bookmarks/providers/bookmark_provider.dart';
+import '../../mistakes/providers/mistakes_provider.dart';
 import '../../learning/providers/progress_stats_provider.dart';
 import '../../learning/providers/chapter_progress_provider.dart';
 import '../../learning/providers/learning_insights_provider.dart';
 import '../../../shared/constants/app_colors.dart';
 import '../../../shared/constants/app_radius.dart';
 import '../../../shared/constants/app_spacing.dart';
+import '../../../shared/widgets/app_logo.dart';
 
-/// Home Screen — Phase 9.3: Personalized learning dashboard.
+/// Home Screen — UI Review Pass.
 ///
-/// Answers the single question: "What should I do next?"
-/// All data is read from existing Learning Engine providers —
-/// no business logic lives here.
+/// Answers: "What should I do next?"
+/// All data sourced from existing providers. No business logic here.
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
@@ -23,7 +25,12 @@ class HomeScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final stats = ref.watch(progressStatsProvider);
     final continueAttempt = ref.watch(continueLearningProvider);
+    final bookmarks = ref.watch(bookmarkProvider);
+    final mistakes = ref.watch(mistakesProvider);
     final hasActivity = stats.hasActivity;
+    final hasSnapshotData = hasActivity ||
+        bookmarks.isNotEmpty ||
+        mistakes.isNotEmpty;
 
     return SafeArea(
       child: CustomScrollView(
@@ -37,30 +44,34 @@ class HomeScreen extends ConsumerWidget {
             ),
             sliver: SliverList(
               delegate: SliverChildListDelegate([
-                // ── Section 1: Welcome ───────────────────────────────────────
-                _WelcomeHeader(hasActivity: hasActivity),
+                // ── 1. Greeting ───────────────────────────────────────────────
+                const _WelcomeHeader(),
                 const SizedBox(height: AppSpacing.xxl),
 
-                // ── Section 2: Continue Learning ─────────────────────────────
+                // ── 2. Continue Learning (primary card) ───────────────────────
                 _ContinueLearningCard(attempt: continueAttempt, ref: ref),
                 const SizedBox(height: AppSpacing.xxl),
 
-                // ── Section 3: Quick stats (only when activity exists) ────────
-                if (hasActivity) ...[
-                  _QuickStatsRow(
+                // ── 3. Today's Snapshot ───────────────────────────────────────
+                if (hasSnapshotData) ...[
+                  const _SectionLabel("Today's snapshot"),
+                  const SizedBox(height: AppSpacing.sm),
+                  _TodaysSnapshot(
                     attempted: stats.totalAttempts,
                     accuracyPercent: stats.accuracyPercent,
+                    bookmarkCount: bookmarks.length,
+                    mistakeCount: mistakes.length,
                   ),
                   const SizedBox(height: AppSpacing.xxl),
                 ],
 
-                // ── Section 4: Quick actions ─────────────────────────────────
+                // ── 4. Quick Actions ──────────────────────────────────────────
                 const _SectionLabel('Quick actions'),
                 const SizedBox(height: AppSpacing.sm),
                 const _QuickActionsRow(),
                 const SizedBox(height: AppSpacing.xxl),
 
-                // ── Section 5: Insights (only when activity exists) ──────────
+                // ── 5. Insights (only when enough activity) ───────────────────
                 if (hasActivity) ...[
                   const _SectionLabel('Insights'),
                   const SizedBox(height: AppSpacing.sm),
@@ -68,7 +79,7 @@ class HomeScreen extends ConsumerWidget {
                   const SizedBox(height: AppSpacing.xxl),
                 ],
 
-                // ── Section 6: Subject progress ──────────────────────────────
+                // ── 6. Subjects ───────────────────────────────────────────────
                 const _SectionLabel('Subjects'),
                 const SizedBox(height: AppSpacing.sm),
                 _SubjectProgressColumn(ref: ref),
@@ -81,40 +92,42 @@ class HomeScreen extends ConsumerWidget {
   }
 }
 
-// ── Section 1: Welcome ────────────────────────────────────────────────────────
+// ── 1. Greeting ───────────────────────────────────────────────────────────────
+
+const String _motivationalSubtitle = 'Consistency beats intensity.';
 
 class _WelcomeHeader extends StatelessWidget {
-  const _WelcomeHeader({required this.hasActivity});
-
-  final bool hasActivity;
+  const _WelcomeHeader();
 
   @override
   Widget build(BuildContext context) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Expanded(
+        // Compact PrepEdge icon — subtle brand anchor
+        const AppLogo(size: 32, showLabel: false, showTagline: false),
+        const SizedBox(width: AppSpacing.sm),
+        const Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                'Hey there, Arjun',
+              Text(
+                'Hey, Arjun 👋',
                 style: TextStyle(
-                  fontSize: 20,
+                  fontSize: 22,
                   fontWeight: FontWeight.w700,
                   color: AppColors.textPrimary,
-                  letterSpacing: -0.4,
+                  letterSpacing: -0.5,
                 ),
               ),
-              const SizedBox(height: 3),
+              SizedBox(height: 3),
               Text(
-                hasActivity
-                    ? 'What would you like to study next?'
-                    : 'Start solving to track your progress.',
-                style: const TextStyle(
-                  fontSize: 14,
+                _motivationalSubtitle,
+                style: TextStyle(
+                  fontSize: 13,
                   fontWeight: FontWeight.w400,
                   color: AppColors.textSecondary,
+                  height: 1.4,
                 ),
               ),
             ],
@@ -173,7 +186,7 @@ class _SectionLabel extends StatelessWidget {
   }
 }
 
-// ── Section 2: Continue Learning ──────────────────────────────────────────────
+// ── 2. Continue Learning ──────────────────────────────────────────────────────
 
 class _ContinueLearningCard extends StatelessWidget {
   const _ContinueLearningCard({
@@ -205,7 +218,6 @@ class _ContinueLearningCard extends StatelessWidget {
       if (subjectName.isNotEmpty) break;
     }
 
-    // Get live progress for this chapter
     final progress = ref.watch(chapterProgressProvider(attempt.chapterId));
 
     return GestureDetector(
@@ -215,13 +227,13 @@ class _ContinueLearningCard extends StatelessWidget {
       child: Container(
         decoration: const BoxDecoration(
           color: AppColors.primary,
-          borderRadius: AppRadius.radiusXl,
+          borderRadius: AppRadius.radiusXxl,
         ),
         padding: const EdgeInsets.all(AppSpacing.xl),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Badge
+            // Subject badge
             _WhiteBadge(
               label: subjectName.isNotEmpty ? subjectName : attempt.subjectId,
             ),
@@ -284,7 +296,7 @@ class _ContinueLearningCard extends StatelessWidget {
             // Resume button
             SizedBox(
               width: double.infinity,
-              height: 42,
+              height: 44,
               child: ElevatedButton(
                 onPressed: () => context.push(
                   '/subjects/${attempt.subjectId}/chapters/${attempt.chapterId}/practice',
@@ -295,15 +307,15 @@ class _ContinueLearningCard extends StatelessWidget {
                   elevation: 0,
                   shadowColor: Colors.transparent,
                   shape: const RoundedRectangleBorder(
-                    borderRadius: AppRadius.radiusMd,
+                    borderRadius: AppRadius.radiusLg,
                   ),
                 ),
                 child: const Text(
                   'Resume',
                   style: TextStyle(
-                    fontSize: 14,
+                    fontSize: 15,
                     fontWeight: FontWeight.w600,
-                    letterSpacing: -0.1,
+                    letterSpacing: -0.2,
                   ),
                 ),
               ),
@@ -326,8 +338,16 @@ class _ContinueLearningEmpty extends StatelessWidget {
       padding: const EdgeInsets.all(AppSpacing.xl),
       decoration: BoxDecoration(
         color: AppColors.cardBackground,
-        borderRadius: AppRadius.radiusXl,
-        border: Border.all(color: AppColors.border),
+        borderRadius: AppRadius.radiusXxl,
+        border: Border.all(color: AppColors.border, width: 0.75),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x0C000000),
+            blurRadius: 16,
+            offset: Offset(0, 4),
+            spreadRadius: 0,
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -368,7 +388,7 @@ class _ContinueLearningEmpty extends StatelessWidget {
           const SizedBox(height: AppSpacing.lg),
           SizedBox(
             width: double.infinity,
-            height: 42,
+            height: 44,
             child: ElevatedButton(
               onPressed: () => context.go('/subjects'),
               style: ElevatedButton.styleFrom(
@@ -377,7 +397,7 @@ class _ContinueLearningEmpty extends StatelessWidget {
                 elevation: 0,
                 shadowColor: Colors.transparent,
                 shape: const RoundedRectangleBorder(
-                  borderRadius: AppRadius.radiusMd,
+                  borderRadius: AppRadius.radiusLg,
                 ),
               ),
               child: const Text(
@@ -424,46 +444,82 @@ class _WhiteBadge extends StatelessWidget {
   }
 }
 
-// ── Section 3: Quick stats ────────────────────────────────────────────────────
+// ── 3. Today's Snapshot ───────────────────────────────────────────────────────
+//
+// 2×2 grid showing all four real stats from existing providers.
 
-class _QuickStatsRow extends StatelessWidget {
-  const _QuickStatsRow({
+class _TodaysSnapshot extends StatelessWidget {
+  const _TodaysSnapshot({
     required this.attempted,
     required this.accuracyPercent,
+    required this.bookmarkCount,
+    required this.mistakeCount,
   });
 
   final int attempted;
   final int accuracyPercent;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: _StatChip(
-            icon: Icons.check_circle_outline_rounded,
-            value: '$attempted',
-            label: 'Attempted',
-            accentColor: AppColors.primary,
-          ),
-        ),
-        const SizedBox(width: AppSpacing.cardGap),
-        Expanded(
-          child: _StatChip(
-            icon: Icons.track_changes_outlined,
-            value: '$accuracyPercent%',
-            label: 'Accuracy',
-            accentColor: _accuracyColor(accuracyPercent),
-          ),
-        ),
-      ],
-    );
-  }
+  final int bookmarkCount;
+  final int mistakeCount;
 
   static Color _accuracyColor(int percent) {
     if (percent >= 80) return AppColors.success;
     if (percent >= 50) return AppColors.warning;
     return AppColors.error;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Row(
+          children: [
+            Expanded(
+              child: _StatChip(
+                icon: Icons.check_circle_outline_rounded,
+                value: '$attempted',
+                label: 'Attempted',
+                accentColor: AppColors.primary,
+              ),
+            ),
+            const SizedBox(width: AppSpacing.cardGap),
+            Expanded(
+              child: _StatChip(
+                icon: Icons.track_changes_outlined,
+                value: attempted > 0 ? '$accuracyPercent%' : '—',
+                label: 'Accuracy',
+                accentColor: attempted > 0
+                    ? _accuracyColor(accuracyPercent)
+                    : AppColors.textTertiary,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: AppSpacing.cardGap),
+        Row(
+          children: [
+            Expanded(
+              child: _StatChip(
+                icon: Icons.bookmark_outline_rounded,
+                value: '$bookmarkCount',
+                label: 'Bookmarks',
+                accentColor: AppColors.mathAccent,
+              ),
+            ),
+            const SizedBox(width: AppSpacing.cardGap),
+            Expanded(
+              child: _StatChip(
+                icon: Icons.highlight_off_outlined,
+                value: '$mistakeCount',
+                label: 'Mistakes',
+                accentColor: mistakeCount > 0
+                    ? AppColors.error
+                    : AppColors.textTertiary,
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
   }
 }
 
@@ -489,8 +545,16 @@ class _StatChip extends StatelessWidget {
       ),
       decoration: BoxDecoration(
         color: AppColors.cardBackground,
-        borderRadius: AppRadius.radiusLg,
-        border: Border.all(color: AppColors.border),
+        borderRadius: AppRadius.radiusXl,
+        border: Border.all(color: AppColors.border, width: 0.75),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x08000000),
+            blurRadius: 10,
+            offset: Offset(0, 3),
+            spreadRadius: 0,
+          ),
+        ],
       ),
       child: Row(
         children: [
@@ -524,228 +588,7 @@ class _StatChip extends StatelessWidget {
   }
 }
 
-// ── Section 4: Subject progress ───────────────────────────────────────────────
-
-class _SubjectProgressColumn extends StatelessWidget {
-  const _SubjectProgressColumn({required this.ref});
-
-  final WidgetRef ref;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: SubjectsData.all.map((subject) {
-        final progress = ref.watch(subjectProgressProvider(subject.id));
-        return Padding(
-          padding: const EdgeInsets.only(bottom: AppSpacing.cardGap),
-          child: _SubjectProgressRow(
-            subject: subject,
-            completionPercent: progress.completionPercent,
-            completionFraction: progress.completionPercentage,
-            onTap: () => context.go('/subjects'),
-          ),
-        );
-      }).toList(),
-    );
-  }
-}
-
-class _SubjectProgressRow extends StatelessWidget {
-  const _SubjectProgressRow({
-    required this.subject,
-    required this.completionPercent,
-    required this.completionFraction,
-    required this.onTap,
-  });
-
-  final SubjectModel subject;
-  final int completionPercent;
-  final double completionFraction;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      behavior: HitTestBehavior.opaque,
-      child: Container(
-        padding: const EdgeInsets.all(AppSpacing.md),
-        decoration: BoxDecoration(
-          color: AppColors.cardBackground,
-          borderRadius: AppRadius.radiusLg,
-          border: Border.all(color: AppColors.border),
-        ),
-        child: Row(
-          children: [
-            // Accent dot
-            Container(
-              width: 8,
-              height: 8,
-              decoration: BoxDecoration(
-                color: subject.accentColor,
-                shape: BoxShape.circle,
-              ),
-            ),
-            const SizedBox(width: AppSpacing.sm),
-            // Subject name + progress bar
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          subject.name,
-                          style: const TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.textPrimary,
-                          ),
-                        ),
-                      ),
-                      Text(
-                        '$completionPercent%',
-                        style: const TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.textSecondary,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: AppSpacing.xxs),
-                  ClipRRect(
-                    borderRadius: AppRadius.radiusFull,
-                    child: LinearProgressIndicator(
-                      value: completionFraction,
-                      minHeight: 3,
-                      backgroundColor: AppColors.progressTrack,
-                      valueColor: AlwaysStoppedAnimation<Color>(
-                        subject.accentColor,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(width: AppSpacing.sm),
-            const Icon(
-              Icons.chevron_right_rounded,
-              size: 16,
-              color: AppColors.iconSecondary,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-// ── Section 5: Insights ───────────────────────────────────────────────────────
-
-class _InsightsRow extends StatelessWidget {
-  const _InsightsRow({required this.ref});
-
-  final WidgetRef ref;
-
-  @override
-  Widget build(BuildContext context) {
-    final weakestId = ref.watch(weakestChapterProvider);
-    final mostPracticedId = ref.watch(mostPracticedChapterProvider);
-
-    if (weakestId == null && mostPracticedId == null) return const SizedBox.shrink();
-
-    return Row(
-      children: [
-        if (weakestId != null)
-          Expanded(
-            child: _InsightChip(
-              icon: Icons.trending_down_rounded,
-              accentColor: AppColors.error,
-              label: 'Needs work',
-              value: _chapterTitle(weakestId),
-            ),
-          ),
-        if (weakestId != null && mostPracticedId != null)
-          const SizedBox(width: AppSpacing.cardGap),
-        if (mostPracticedId != null)
-          Expanded(
-            child: _InsightChip(
-              icon: Icons.repeat_rounded,
-              accentColor: AppColors.warning,
-              label: 'Most practiced',
-              value: _chapterTitle(mostPracticedId),
-            ),
-          ),
-      ],
-    );
-  }
-
-  static String _chapterTitle(String chapterId) {
-    for (final subject in SubjectsData.all) {
-      for (final ch in DummyChapters.forSubject(subject.id)) {
-        if (ch.id == chapterId) return ch.title;
-      }
-    }
-    return chapterId;
-  }
-}
-
-class _InsightChip extends StatelessWidget {
-  const _InsightChip({
-    required this.icon,
-    required this.accentColor,
-    required this.label,
-    required this.value,
-  });
-
-  final IconData icon;
-  final Color accentColor;
-  final String label;
-  final String value;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(AppSpacing.md),
-      decoration: BoxDecoration(
-        color: AppColors.cardBackground,
-        borderRadius: AppRadius.radiusLg,
-        border: Border.all(color: AppColors.border),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(icon, size: 16, color: accentColor),
-          const SizedBox(height: AppSpacing.xs),
-          Text(
-            label,
-            style: const TextStyle(
-              fontSize: 11,
-              fontWeight: FontWeight.w500,
-              color: AppColors.textTertiary,
-            ),
-          ),
-          const SizedBox(height: 2),
-          Text(
-            value,
-            style: const TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w600,
-              color: AppColors.textPrimary,
-              height: 1.3,
-            ),
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// ── Section 6: Quick actions ──────────────────────────────────────────────────
+// ── 4. Quick Actions ──────────────────────────────────────────────────────────
 
 class _QuickActionsRow extends StatelessWidget {
   const _QuickActionsRow();
@@ -810,8 +653,16 @@ class _ActionCard extends StatelessWidget {
         ),
         decoration: BoxDecoration(
           color: AppColors.cardBackground,
-          borderRadius: AppRadius.radiusLg,
-          border: Border.all(color: AppColors.border),
+          borderRadius: AppRadius.radiusXl,
+          border: Border.all(color: AppColors.border, width: 0.75),
+          boxShadow: const [
+            BoxShadow(
+              color: Color(0x08000000),
+              blurRadius: 10,
+              offset: Offset(0, 3),
+              spreadRadius: 0,
+            ),
+          ],
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -834,6 +685,244 @@ class _ActionCard extends StatelessWidget {
                 color: AppColors.textPrimary,
                 letterSpacing: -0.1,
               ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ── 5. Insights ───────────────────────────────────────────────────────────────
+
+class _InsightsRow extends StatelessWidget {
+  const _InsightsRow({required this.ref});
+
+  final WidgetRef ref;
+
+  @override
+  Widget build(BuildContext context) {
+    final weakestId = ref.watch(weakestChapterProvider);
+    final mostPracticedId = ref.watch(mostPracticedChapterProvider);
+
+    if (weakestId == null && mostPracticedId == null) {
+      return const SizedBox.shrink();
+    }
+
+    return Row(
+      children: [
+        if (weakestId != null)
+          Expanded(
+            child: _InsightChip(
+              icon: Icons.trending_down_rounded,
+              accentColor: AppColors.error,
+              label: 'Needs work',
+              value: _chapterTitle(weakestId),
+            ),
+          ),
+        if (weakestId != null && mostPracticedId != null)
+          const SizedBox(width: AppSpacing.cardGap),
+        if (mostPracticedId != null)
+          Expanded(
+            child: _InsightChip(
+              icon: Icons.repeat_rounded,
+              accentColor: AppColors.warning,
+              label: 'Most practiced',
+              value: _chapterTitle(mostPracticedId),
+            ),
+          ),
+      ],
+    );
+  }
+
+  static String _chapterTitle(String chapterId) {
+    for (final subject in SubjectsData.all) {
+      for (final ch in DummyChapters.forSubject(subject.id)) {
+        if (ch.id == chapterId) return ch.title;
+      }
+    }
+    return chapterId;
+  }
+}
+
+class _InsightChip extends StatelessWidget {
+  const _InsightChip({
+    required this.icon,
+    required this.accentColor,
+    required this.label,
+    required this.value,
+  });
+
+  final IconData icon;
+  final Color accentColor;
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.md),
+      decoration: BoxDecoration(
+        color: AppColors.cardBackground,
+        borderRadius: AppRadius.radiusXl,
+        border: Border.all(color: AppColors.border, width: 0.75),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x08000000),
+            blurRadius: 10,
+            offset: Offset(0, 3),
+            spreadRadius: 0,
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, size: 16, color: accentColor),
+          const SizedBox(height: AppSpacing.xs),
+          Text(
+            label,
+            style: const TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.w500,
+              color: AppColors.textTertiary,
+            ),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            value,
+            style: const TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: AppColors.textPrimary,
+              height: 1.3,
+            ),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ── 6. Subjects ───────────────────────────────────────────────────────────────
+
+class _SubjectProgressColumn extends StatelessWidget {
+  const _SubjectProgressColumn({required this.ref});
+
+  final WidgetRef ref;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: SubjectsData.all.map((subject) {
+        final progress = ref.watch(subjectProgressProvider(subject.id));
+        return Padding(
+          padding: const EdgeInsets.only(bottom: AppSpacing.cardGap),
+          child: _SubjectProgressRow(
+            subject: subject,
+            completionPercent: progress.completionPercent,
+            completionFraction: progress.completionPercentage,
+            onTap: () => context.go('/subjects'),
+          ),
+        );
+      }).toList(),
+    );
+  }
+}
+
+class _SubjectProgressRow extends StatelessWidget {
+  const _SubjectProgressRow({
+    required this.subject,
+    required this.completionPercent,
+    required this.completionFraction,
+    required this.onTap,
+  });
+
+  final SubjectModel subject;
+  final int completionPercent;
+  final double completionFraction;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: Container(
+        padding: const EdgeInsets.all(AppSpacing.md),
+        decoration: BoxDecoration(
+          color: AppColors.cardBackground,
+          borderRadius: AppRadius.radiusLg,
+          border: Border.all(color: AppColors.border, width: 0.75),
+          boxShadow: const [
+            BoxShadow(
+              color: Color(0x07000000),
+              blurRadius: 8,
+              offset: Offset(0, 2),
+              spreadRadius: 0,
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            // Accent dot
+            Container(
+              width: 8,
+              height: 8,
+              decoration: BoxDecoration(
+                color: subject.accentColor,
+                shape: BoxShape.circle,
+              ),
+            ),
+            const SizedBox(width: AppSpacing.sm),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          subject.name,
+                          style: const TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.textPrimary,
+                          ),
+                        ),
+                      ),
+                      Text(
+                        '$completionPercent%',
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.textSecondary,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: AppSpacing.xxs),
+                  ClipRRect(
+                    borderRadius: AppRadius.radiusFull,
+                    child: LinearProgressIndicator(
+                      value: completionFraction,
+                      minHeight: 3,
+                      backgroundColor: AppColors.progressTrack,
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        subject.accentColor,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: AppSpacing.sm),
+            const Icon(
+              Icons.chevron_right_rounded,
+              size: 16,
+              color: AppColors.iconSecondary,
             ),
           ],
         ),

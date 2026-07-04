@@ -33,23 +33,40 @@ class ChapterCard extends StatelessWidget {
     // Derive display values from live ChapterProgress.
     final bool isStarted = progress.hasActivity;
     final bool isCompleted = progress.isCompleted;
-    final String ctaLabel =
-        isCompleted ? 'Review' : isStarted ? 'Continue' : 'Start';
+    final String ctaLabel = isCompleted
+        ? 'Review'
+        : isStarted
+            ? 'Continue'
+            : 'Start';
 
     return Container(
       decoration: BoxDecoration(
         color: AppColors.cardBackground,
-        borderRadius: AppRadius.radiusXl,
-        border: Border.all(color: AppColors.border),
+        borderRadius: AppRadius.radiusXxl,
+        border: Border.all(color: AppColors.border, width: 0.75),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x0C000000), // ~5% black — very soft lift
+            blurRadius: 16,
+            offset: Offset(0, 4),
+            spreadRadius: 0,
+          ),
+          BoxShadow(
+            color: Color(0x06000000), // ~2.5% black — subtle ambient
+            blurRadius: 4,
+            offset: Offset(0, 1),
+            spreadRadius: 0,
+          ),
+        ],
       ),
       child: ClipRRect(
-        borderRadius: AppRadius.radiusXl,
+        borderRadius: AppRadius.radiusXxl,
         child: Material(
           color: Colors.transparent,
           child: InkWell(
             onTap: onTap,
             child: Padding(
-              padding: const EdgeInsets.all(AppSpacing.lg),
+              padding: const EdgeInsets.all(AppSpacing.cardPadding),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -197,8 +214,7 @@ class _SubLabel extends StatelessWidget {
     if (isCompleted) {
       label = 'Completed · ${progress.accuracyPercent}% accuracy';
     } else if (isStarted) {
-      final remaining =
-          progress.totalQuestions - progress.attemptedQuestions;
+      final remaining = progress.totalQuestions - progress.attemptedQuestions;
       label = '$remaining remaining';
     } else {
       label = '${progress.totalQuestions} questions';
@@ -239,7 +255,7 @@ class _ProgressRow extends StatelessWidget {
                 borderRadius: AppRadius.radiusFull,
                 child: LinearProgressIndicator(
                   value: progress.completionPercentage,
-                  minHeight: 4,
+                  minHeight: 5,
                   backgroundColor: AppColors.progressTrack,
                   valueColor: AlwaysStoppedAnimation<Color>(accentColor),
                 ),

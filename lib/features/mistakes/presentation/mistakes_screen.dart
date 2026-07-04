@@ -53,7 +53,6 @@ Map<String, List<_MistakeEntry>> _groupByChapter(List<WrongAnswer> wrongs) {
   return result;
 }
 
-
 // ── Screen ────────────────────────────────────────────────────────────────────
 
 /// Mistakes screen — Phase 6.
@@ -75,9 +74,8 @@ class MistakesScreen extends ConsumerWidget {
         title: const Text('Mistakes'),
       ),
       body: SafeArea(
-        child: wrongs.isEmpty
-            ? const _EmptyState()
-            : _MistakeList(wrongs: wrongs),
+        child:
+            wrongs.isEmpty ? const _EmptyState() : _MistakeList(wrongs: wrongs),
       ),
     );
   }
@@ -223,6 +221,7 @@ class _MistakeTile extends ConsumerWidget {
   });
 
   final _MistakeEntry entry;
+
   /// All wrong question IDs for this chapter.
   final List<String> chapterQuestionIds;
 
@@ -255,8 +254,16 @@ class _MistakeTile extends ConsumerWidget {
           padding: const EdgeInsets.all(AppSpacing.cardPadding),
           decoration: BoxDecoration(
             color: AppColors.cardBackground,
-            borderRadius: AppRadius.radiusMd,
-            border: Border.all(color: AppColors.border),
+            borderRadius: AppRadius.radiusXl,
+            border: Border.all(color: AppColors.border, width: 0.75),
+            boxShadow: const [
+              BoxShadow(
+                color: Color(0x08000000),
+                blurRadius: 10,
+                offset: Offset(0, 3),
+                spreadRadius: 0,
+              ),
+            ],
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,

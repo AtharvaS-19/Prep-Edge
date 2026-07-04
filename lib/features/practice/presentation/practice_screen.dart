@@ -133,19 +133,21 @@ class _PracticeScreenState extends ConsumerState<PracticeScreen> {
     // Phase 7: record the learning event.
     final now = DateTime.now();
     ref.read(learningProvider.notifier).record(
-      QuestionAttempt(
-        questionId: _currentQuestion.id,
-        subjectId: widget.subjectId,
-        chapterId: widget.chapterId,
-        selectedOption: _selectedOptionIndex!,
-        correctOption: _currentQuestion.correctOptionIndex,
-        isCorrect: correct,
-        attemptedAt: now,
-        timeTaken: now.difference(_questionStartTime),
-        attemptNumber:
-            ref.read(learningProvider.notifier).countFor(_currentQuestion.id) + 1,
-      ),
-    );
+          QuestionAttempt(
+            questionId: _currentQuestion.id,
+            subjectId: widget.subjectId,
+            chapterId: widget.chapterId,
+            selectedOption: _selectedOptionIndex!,
+            correctOption: _currentQuestion.correctOptionIndex,
+            isCorrect: correct,
+            attemptedAt: now,
+            timeTaken: now.difference(_questionStartTime),
+            attemptNumber: ref
+                    .read(learningProvider.notifier)
+                    .countFor(_currentQuestion.id) +
+                1,
+          ),
+        );
     setState(() {
       _isSubmitted = true;
       _results[_currentQuestion.id] = correct;
@@ -184,9 +186,7 @@ class _PracticeScreenState extends ConsumerState<PracticeScreen> {
   }
 
   void _toggleBookmark() {
-    ref
-        .read(bookmarkProvider.notifier)
-        .toggle(_currentQuestion.id);
+    ref.read(bookmarkProvider.notifier).toggle(_currentQuestion.id);
   }
 
   @override
@@ -199,9 +199,8 @@ class _PracticeScreenState extends ConsumerState<PracticeScreen> {
     // ref.watch(bookmarkProvider.notifier) watches the notifier object, which
     // never changes, so it would NOT rebuild. Watching the provider itself
     // watches the List<String> state, which is replaced on every toggle().
-    final isBookmarked = ref
-        .watch(bookmarkProvider)
-        .contains(_currentQuestion.id);
+    final isBookmarked =
+        ref.watch(bookmarkProvider).contains(_currentQuestion.id);
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -227,7 +226,8 @@ class _PracticeScreenState extends ConsumerState<PracticeScreen> {
                     ? Icons.bookmark_rounded
                     : Icons.bookmark_outline_rounded,
                 key: ValueKey<bool>(isBookmarked),
-                color: isBookmarked ? AppColors.primary : AppColors.iconSecondary,
+                color:
+                    isBookmarked ? AppColors.primary : AppColors.iconSecondary,
                 size: 22,
               ),
             ),
@@ -378,7 +378,8 @@ class _EmptyQuestionsScreen extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.quiz_outlined, size: 40, color: AppColors.iconSecondary),
+              Icon(Icons.quiz_outlined,
+                  size: 40, color: AppColors.iconSecondary),
               SizedBox(height: AppSpacing.md),
               Text(
                 'No questions available',
