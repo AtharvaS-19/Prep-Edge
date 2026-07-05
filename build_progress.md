@@ -331,6 +331,7 @@
 - [x] Implemented `LearningRepository` and its corresponding Riverpod provider.
 - [x] Designed all repository APIs with Firebase dependencies injected via constructor with singleton fallbacks.
 - [x] Kept all read/write/stream methods as stubbed placeholders with detailed commented serialization code, ready for active integration in the next sprint.
+- [x] Fixed `ChangeNotifier` compilation error in `lib/app/router.dart` by adding the missing `package:flutter/foundation.dart` import.
 
 ---
 
