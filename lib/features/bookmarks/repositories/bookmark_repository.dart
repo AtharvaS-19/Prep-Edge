@@ -37,6 +37,7 @@ class BookmarkRepository {
 
   /// Returns the `users/{uid}/bookmarks` [CollectionReference].
   /// Throws a [StateError] if no user is authenticated.
+  // ignore: unused_element
   CollectionReference<Map<String, dynamic>> get _bookmarksCol {
     final uid = _auth.currentUser?.uid;
     if (uid == null) {

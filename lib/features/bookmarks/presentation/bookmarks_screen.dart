@@ -3,11 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:exam_prep_app/features/bookmarks/providers/bookmark_provider.dart';
-import 'package:exam_prep_app/features/chapters/data/dummy_chapters.dart';
+import 'package:exam_prep_app/features/catalog/providers/catalog_provider.dart';
 import 'package:exam_prep_app/features/mistakes/providers/mistakes_provider.dart';
-import 'package:exam_prep_app/features/practice/data/dummy_questions.dart';
 import 'package:exam_prep_app/features/practice/models/question.dart';
-import 'package:exam_prep_app/features/subjects/data/subjects_data.dart';
 import 'package:exam_prep_app/features/subjects/models/subject_model.dart';
 import 'package:exam_prep_app/shared/constants/app_colors.dart';
 import 'package:exam_prep_app/shared/constants/app_radius.dart';
@@ -37,13 +35,14 @@ class _BookmarkEntry {
 /// only subjects that have at least one match.
 Map<SubjectModel, List<_BookmarkEntry>> _resolveBookmarks(
   Set<String> bookmarkedIds,
+  WidgetRef ref,
 ) {
   final result = <SubjectModel, List<_BookmarkEntry>>{};
 
-  for (final subject in SubjectsData.all) {
-    final chapters = DummyChapters.forSubject(subject.id);
+  for (final subject in ref.read(allSubjectsProvider)) {
+    final chapters = ref.read(chaptersForSubjectProvider(subject.id));
     for (final chapter in chapters) {
-      final questions = DummyQuestions.forChapter(chapter.id);
+      final questions = ref.read(questionsForChapterProvider(chapter.id));
       for (final question in questions) {
         if (bookmarkedIds.contains(question.id)) {
           result.putIfAbsent(subject, () => []).add(
@@ -93,14 +92,14 @@ class BookmarksScreen extends ConsumerWidget {
 
 // ── Populated list ────────────────────────────────────────────────────────────
 
-class _BookmarkList extends StatelessWidget {
+class _BookmarkList extends ConsumerWidget {
   const _BookmarkList({required this.bookmarkedIds});
 
   final Set<String> bookmarkedIds;
 
   @override
-  Widget build(BuildContext context) {
-    final grouped = _resolveBookmarks(bookmarkedIds);
+  Widget build(BuildContext context, WidgetRef ref) {
+    final grouped = _resolveBookmarks(bookmarkedIds, ref);
 
     if (grouped.isEmpty) {
       // All bookmarked IDs resolved to nothing — data edge case.

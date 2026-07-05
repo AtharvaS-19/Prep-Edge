@@ -49,6 +49,7 @@ class LearningRepository {
 
   /// Returns the `users/{uid}/attempts` [CollectionReference].
   /// Throws a [StateError] if no user is authenticated.
+  // ignore: unused_element
   CollectionReference<Map<String, dynamic>> get _attemptsCol {
     final uid = _auth.currentUser?.uid;
     if (uid == null) {

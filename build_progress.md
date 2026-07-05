@@ -333,12 +333,18 @@
 - [x] Kept all read/write/stream methods as stubbed placeholders with detailed commented serialization code, ready for active integration in the next sprint.
 - [x] Fixed `ChangeNotifier` compilation error in `lib/app/router.dart` by adding the missing `package:flutter/foundation.dart` import.
 
+## ✅ Sprint 10.5 — Catalog Migration
+- [x] Abstracted all static dummy data access behind the new `CatalogRepository`.
+- [x] Implemented Riverpod providers for repository-backed data access: `catalogRepositoryProvider`, `allSubjectsProvider`, `subjectsForStreamProvider`, `subjectByIdProvider`, `chaptersForSubjectProvider`, `questionsForChapterProvider`.
+- [x] Migrated all UI screens (`home_screen.dart`, `progress_screen.dart`, `subjects_screen.dart`, `chapter_dashboard_screen.dart`, `practice_screen.dart`, `bookmarks_screen.dart`, `mistakes_screen.dart`, and `router.dart`) to consume catalog data strictly via Riverpod providers instead of direct static class lookups.
+- [x] Preserved existing models, navigation logic, and public provider APIs without refactoring or modifying application behavior.
+
 ---
 
 ## Current Task
-**Status:** Sprint 10.4 completed. The repository structure and contracts for Firestore integration are fully established.
+**Status:** Sprint 10.5 completed. All static dummy data has been successfully abstracted behind Riverpod catalog providers and CatalogRepository, and the codebase compiles cleanly with no warnings or errors.
 **Next file:** TBD
-**Last completed file:** `lib/features/learning/providers/learning_repository_provider.dart` — Exposed LearningRepository via Riverpod.
+**Last completed file:** `lib/features/subjects/presentation/subjects_screen.dart` — Migrated to ConsumerStatefulWidget and wired to subjectsForStreamProvider.
 
 ---
 

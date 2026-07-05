@@ -12,8 +12,8 @@ import '../features/chapters/presentation/chapter_dashboard_screen.dart';
 import '../features/bookmarks/presentation/bookmarks_screen.dart';
 import '../features/mistakes/presentation/mistakes_screen.dart';
 import '../features/progress/presentation/progress_screen.dart';
-import '../features/chapters/data/dummy_chapters.dart';
 import '../features/chapters/models/chapter.dart';
+import '../features/catalog/providers/catalog_provider.dart';
 import '../features/practice/presentation/practice_screen.dart';
 import '../features/practice/presentation/practice_result_screen.dart';
 
@@ -113,7 +113,7 @@ final routerProvider = Provider<GoRouter>((ref) {
                           state.pathParameters['subjectId'] ?? '';
                       final chapterId =
                           state.pathParameters['chapterId'] ?? '';
-                      final chapters = DummyChapters.forSubject(subjectId);
+                      final chapters = ref.read(chaptersForSubjectProvider(subjectId));
                       final chapter = chapters.firstWhere(
                         (c) => c.id == chapterId,
                         orElse: () => const Chapter(

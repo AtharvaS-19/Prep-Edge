@@ -5,7 +5,7 @@ import 'package:exam_prep_app/features/bookmarks/providers/bookmark_provider.dar
 import 'package:exam_prep_app/features/learning/models/question_attempt.dart';
 import 'package:exam_prep_app/features/learning/providers/learning_provider.dart';
 import 'package:exam_prep_app/features/mistakes/providers/mistakes_provider.dart';
-import 'package:exam_prep_app/features/practice/data/dummy_questions.dart';
+import 'package:exam_prep_app/features/catalog/providers/catalog_provider.dart';
 import 'package:exam_prep_app/features/practice/models/question.dart';
 import 'package:exam_prep_app/features/practice/presentation/widgets/explanation_card.dart';
 import 'package:exam_prep_app/features/practice/presentation/widgets/question_card.dart';
@@ -17,7 +17,7 @@ import '../../../../shared/widgets/primary_button.dart';
 /// The Practice Screen — Phase 4 core feature, extended in Phases 5, 6 & 7.
 ///
 /// Manages the full question-solving session for a given chapter:
-/// - Loads questions from [DummyQuestions]
+/// - Loads questions from [questionsForChapterProvider] (catalog layer)
 /// - Tracks selected option, submitted state, and session results
 /// - Shows explanation after each submission
 /// - Navigates to the result screen when all questions are answered
@@ -65,7 +65,7 @@ class _PracticeScreenState extends ConsumerState<PracticeScreen> {
   @override
   void initState() {
     super.initState();
-    final all = DummyQuestions.forChapter(widget.chapterId);
+    final all = ref.read(questionsForChapterProvider(widget.chapterId));
 
     // ── Retry mode: filter to only the provided wrong-answer IDs ────────────
     final retryIds = ref.read(retryQuestionIdsProvider);

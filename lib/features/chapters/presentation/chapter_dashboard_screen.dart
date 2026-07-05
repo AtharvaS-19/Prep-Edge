@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../data/dummy_chapters.dart';
 import '../models/chapter.dart';
-import '../../subjects/data/subjects_data.dart';
 import '../../subjects/models/subject_model.dart';
+import '../../catalog/providers/catalog_provider.dart';
 import '../../learning/models/chapter_progress.dart';
 import '../../learning/providers/chapter_progress_provider.dart';
 import '../../../shared/constants/app_colors.dart';
@@ -52,8 +51,8 @@ class _ChapterDashboardScreenState
   @override
   void initState() {
     super.initState();
-    _allChapters = DummyChapters.forSubject(widget.subjectId);
-    _subject = SubjectsData.findById(widget.subjectId);
+    _allChapters = ref.read(chaptersForSubjectProvider(widget.subjectId));
+    _subject = ref.read(subjectByIdProvider(widget.subjectId));
     _searchController.addListener(() {
       setState(
           () => _searchQuery = _searchController.text.trim().toLowerCase());

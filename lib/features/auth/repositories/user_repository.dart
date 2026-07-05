@@ -35,6 +35,7 @@ class UserRepository {
 
   /// Returns the `users/{uid}` [DocumentReference] for the currently signed-in
   /// user, or throws a [StateError] if no user is authenticated.
+  // ignore: unused_element
   DocumentReference<Map<String, dynamic>> get _userDoc {
     final uid = _auth.currentUser?.uid;
     if (uid == null) throw StateError('UserRepository: no authenticated user.');

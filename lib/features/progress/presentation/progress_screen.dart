@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:exam_prep_app/features/chapters/data/dummy_chapters.dart';
-import 'package:exam_prep_app/features/practice/data/dummy_questions.dart';
+import 'package:exam_prep_app/features/catalog/providers/catalog_provider.dart';
 import 'package:exam_prep_app/features/learning/providers/chapter_progress_provider.dart';
 import 'package:exam_prep_app/features/learning/providers/learning_insights_provider.dart';
 import 'package:exam_prep_app/features/learning/providers/progress_stats_provider.dart';
-import 'package:exam_prep_app/features/subjects/data/subjects_data.dart';
 import 'package:exam_prep_app/features/subjects/models/subject_model.dart';
 import 'package:exam_prep_app/shared/constants/app_colors.dart';
 import 'package:exam_prep_app/shared/constants/app_radius.dart';
@@ -268,7 +266,8 @@ class _SubjectProgressList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
-      children: SubjectsData.all
+      children: ref
+          .watch(allSubjectsProvider)
           .map(
             (subject) => Padding(
               padding: const EdgeInsets.only(bottom: AppSpacing.cardGap),
@@ -412,8 +411,8 @@ class _InsightsPanel extends StatelessWidget {
 
     String? chapterTitle(String? chapterId) {
       if (chapterId == null) return null;
-      for (final subject in SubjectsData.all) {
-        final chapters = DummyChapters.forSubject(subject.id);
+      for (final subject in ref.watch(allSubjectsProvider)) {
+        final chapters = ref.read(chaptersForSubjectProvider(subject.id));
         for (final ch in chapters) {
           if (ch.id == chapterId) return ch.title;
         }
@@ -568,7 +567,7 @@ class _RecentlySolvedList extends StatelessWidget {
   }
 }
 
-class _RecentQuestionRow extends StatelessWidget {
+class _RecentQuestionRow extends ConsumerWidget {
   const _RecentQuestionRow({
     required this.questionId,
     required this.index,
@@ -579,10 +578,10 @@ class _RecentQuestionRow extends StatelessWidget {
 
   /// Resolves question text from [questionId] by scanning all chapters.
   /// Falls back to the raw ID if the question cannot be found.
-  static String _resolveText(String questionId) {
-    for (final subject in SubjectsData.all) {
-      for (final chapter in DummyChapters.forSubject(subject.id)) {
-        for (final q in DummyQuestions.forChapter(chapter.id)) {
+  String _resolveText(String questionId, WidgetRef ref) {
+    for (final subject in ref.read(allSubjectsProvider)) {
+      for (final chapter in ref.read(chaptersForSubjectProvider(subject.id))) {
+        for (final q in ref.read(questionsForChapterProvider(chapter.id))) {
           if (q.id == questionId) return q.text;
         }
       }
@@ -591,8 +590,8 @@ class _RecentQuestionRow extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
-    final text = _resolveText(questionId);
+  Widget build(BuildContext context, WidgetRef ref) {
+    final text = _resolveText(questionId, ref);
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
       child: Row(

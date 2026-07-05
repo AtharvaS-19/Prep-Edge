@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:exam_prep_app/features/mistakes/providers/mistakes_provider.dart';
-import 'package:exam_prep_app/features/practice/data/dummy_questions.dart';
+import 'package:exam_prep_app/features/catalog/providers/catalog_provider.dart';
 import 'package:exam_prep_app/features/practice/models/question.dart';
 import 'package:exam_prep_app/shared/constants/app_colors.dart';
 import 'package:exam_prep_app/shared/constants/app_radius.dart';
@@ -28,11 +28,12 @@ class _MistakeEntry {
 /// by [WrongAnswer.chapterId] → chapter title.
 ///
 /// Entries whose question cannot be resolved (data gap) are silently dropped.
-Map<String, List<_MistakeEntry>> _groupByChapter(List<WrongAnswer> wrongs) {
+Map<String, List<_MistakeEntry>> _groupByChapter(
+    List<WrongAnswer> wrongs, WidgetRef ref) {
   final result = <String, List<_MistakeEntry>>{};
 
   for (final wrong in wrongs) {
-    final questions = DummyQuestions.forChapter(wrong.chapterId);
+    final questions = ref.read(questionsForChapterProvider(wrong.chapterId));
 
     // Direct nullable loop — avoids the cast<Question?>() pattern which can
     // silently swallow type errors on web.
@@ -58,7 +59,7 @@ Map<String, List<_MistakeEntry>> _groupByChapter(List<WrongAnswer> wrongs) {
 /// Mistakes screen — Phase 6.
 ///
 /// Reads [mistakesProvider], resolves full [Question] objects from
-/// [DummyQuestions], groups them by chapter, and displays them as tappable
+/// [questionsForChapterProvider], groups them by chapter, and displays them as tappable
 /// tiles that navigate back to the relevant practice session.
 class MistakesScreen extends ConsumerWidget {
   const MistakesScreen({super.key});
@@ -83,14 +84,14 @@ class MistakesScreen extends ConsumerWidget {
 
 // ── Populated list ────────────────────────────────────────────────────────────
 
-class _MistakeList extends StatelessWidget {
+class _MistakeList extends ConsumerWidget {
   const _MistakeList({required this.wrongs});
 
   final List<WrongAnswer> wrongs;
 
   @override
-  Widget build(BuildContext context) {
-    final grouped = _groupByChapter(wrongs);
+  Widget build(BuildContext context, WidgetRef ref) {
+    final grouped = _groupByChapter(wrongs, ref);
 
     if (grouped.isEmpty) {
       return const _EmptyState();

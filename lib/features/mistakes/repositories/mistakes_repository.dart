@@ -43,6 +43,7 @@ class MistakesRepository {
 
   /// Returns the `users/{uid}/mistakes` [CollectionReference].
   /// Throws a [StateError] if no user is authenticated.
+  // ignore: unused_element
   CollectionReference<Map<String, dynamic>> get _mistakesCol {
     final uid = _auth.currentUser?.uid;
     if (uid == null) {

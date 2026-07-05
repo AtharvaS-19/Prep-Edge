@@ -215,13 +215,13 @@ class _LogoLockup extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return const Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         // Size 74 — ~15% larger than the 64dp Sprint 2 baseline.
         // showLabel: false so we control the gap and name rendering below.
-        const AppLogo(size: 74, showLabel: false, showTagline: false),
-        const SizedBox(height: 8), // tight icon→name connection
+        AppLogo(size: 74, showLabel: false, showTagline: false),
+        SizedBox(height: 8), // tight icon→name connection
         Text(
           AppStrings.appName,
           style: TextStyle(

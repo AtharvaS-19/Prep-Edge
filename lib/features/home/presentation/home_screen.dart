@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../subjects/data/subjects_data.dart';
+import '../../catalog/providers/catalog_provider.dart';
 import '../../subjects/models/subject_model.dart';
-import '../../chapters/data/dummy_chapters.dart';
 import '../../bookmarks/providers/bookmark_provider.dart';
 import '../../mistakes/providers/mistakes_provider.dart';
 import '../../learning/providers/progress_stats_provider.dart';
@@ -101,13 +100,13 @@ class _WelcomeHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
+    return const Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         // Compact PrepEdge icon — subtle brand anchor
-        const AppLogo(size: 32, showLabel: false, showTagline: false),
-        const SizedBox(width: AppSpacing.sm),
-        const Expanded(
+        AppLogo(size: 32, showLabel: false, showTagline: false),
+        SizedBox(width: AppSpacing.sm),
+        Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -133,8 +132,8 @@ class _WelcomeHeader extends StatelessWidget {
             ],
           ),
         ),
-        const SizedBox(width: AppSpacing.md),
-        const _Avatar(initial: 'A'),
+        SizedBox(width: AppSpacing.md),
+        _Avatar(initial: 'A'),
       ],
     );
   }
@@ -206,8 +205,8 @@ class _ContinueLearningCard extends StatelessWidget {
     // Resolve chapter title from chapterId
     String chapterTitle = attempt.chapterId;
     String subjectName = '';
-    for (final subject in SubjectsData.all) {
-      final chapters = DummyChapters.forSubject(subject.id);
+    for (final subject in ref.watch(allSubjectsProvider)) {
+      final chapters = ref.watch(chaptersForSubjectProvider(subject.id));
       for (final ch in chapters) {
         if (ch.id == attempt.chapterId) {
           chapterTitle = ch.title;
@@ -735,9 +734,9 @@ class _InsightsRow extends StatelessWidget {
     );
   }
 
-  static String _chapterTitle(String chapterId) {
-    for (final subject in SubjectsData.all) {
-      for (final ch in DummyChapters.forSubject(subject.id)) {
+  String _chapterTitle(String chapterId) {
+    for (final subject in ref.watch(allSubjectsProvider)) {
+      for (final ch in ref.watch(chaptersForSubjectProvider(subject.id))) {
         if (ch.id == chapterId) return ch.title;
       }
     }
@@ -816,7 +815,7 @@ class _SubjectProgressColumn extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
-      children: SubjectsData.all.map((subject) {
+      children: ref.watch(allSubjectsProvider).map((subject) {
         final progress = ref.watch(subjectProgressProvider(subject.id));
         return Padding(
           padding: const EdgeInsets.only(bottom: AppSpacing.cardGap),

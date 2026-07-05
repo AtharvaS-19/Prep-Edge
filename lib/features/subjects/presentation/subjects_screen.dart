@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../data/subjects_data.dart';
+import '../../catalog/providers/catalog_provider.dart';
 import '../models/subject_model.dart';
 import '../../../shared/constants/app_colors.dart';
 import '../../../shared/constants/app_radius.dart';
@@ -13,14 +14,14 @@ import '../../../shared/constants/app_spacing.dart';
 ///
 /// State is local — a single [ExamStream] value drives the filtered list.
 /// No Riverpod needed here; the complexity doesn't justify it.
-class SubjectsScreen extends StatefulWidget {
+class SubjectsScreen extends ConsumerStatefulWidget {
   const SubjectsScreen({super.key});
 
   @override
-  State<SubjectsScreen> createState() => _SubjectsScreenState();
+  ConsumerState<SubjectsScreen> createState() => _SubjectsScreenState();
 }
 
-class _SubjectsScreenState extends State<SubjectsScreen> {
+class _SubjectsScreenState extends ConsumerState<SubjectsScreen> {
   ExamStream _selectedStream = ExamStream.engineering;
 
   void _onStreamChanged(ExamStream stream) {
@@ -34,7 +35,7 @@ class _SubjectsScreenState extends State<SubjectsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final subjects = SubjectsData.forStream(_selectedStream);
+    final subjects = ref.watch(subjectsForStreamProvider(_selectedStream));
 
     return Scaffold(
       backgroundColor: AppColors.background,
