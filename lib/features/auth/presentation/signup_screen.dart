@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../shared/constants/app_colors.dart';
@@ -8,18 +9,24 @@ import '../../../shared/constants/app_strings.dart';
 import '../../../shared/widgets/app_logo.dart';
 import '../../../shared/widgets/custom_text_field.dart';
 import '../../../shared/widgets/primary_button.dart';
+import '../providers/auth_provider.dart';
 
-/// The Signup screen — UI Redesign Sprint 2 (refined).
+/// The Signup screen.
 ///
-/// Presentation-layer only. Auth logic, navigation, and controllers unchanged.
-class SignupScreen extends StatefulWidget {
+/// Presentation-layer only. Auth logic lives in [AuthNotifier] / [AuthRepository].
+/// The screen reads [authNotifierProvider] for loading state and error messages,
+/// and delegates account creation to [AuthNotifier.signUp].
+///
+/// Navigation on success is handled by the router's redirect — no manual
+/// context.go() is needed.
+class SignupScreen extends ConsumerStatefulWidget {
   const SignupScreen({super.key});
 
   @override
-  State<SignupScreen> createState() => _SignupScreenState();
+  ConsumerState<SignupScreen> createState() => _SignupScreenState();
 }
 
-class _SignupScreenState extends State<SignupScreen> {
+class _SignupScreenState extends ConsumerState<SignupScreen> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
@@ -35,11 +42,31 @@ class _SignupScreenState extends State<SignupScreen> {
     super.dispose();
   }
 
-  void _onCreate() => context.go('/home');
+  Future<void> _onCreate() async {
+    // Client-side password confirmation check.
+    if (_passwordController.text != _confirmPasswordController.text) {
+      // We surface this as if it were a provider error for consistent UX.
+      // No Firebase call is made — we short-circuit here.
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Passwords do not match.')),
+      );
+      return;
+    }
+
+    ref.read(authNotifierProvider.notifier).clearError();
+    await ref.read(authNotifierProvider.notifier).signUp(
+          email: _emailController.text,
+          password: _passwordController.text,
+        );
+    // Navigation to /home is handled automatically by the router redirect.
+  }
+
   void _onLogin() => context.pop();
 
   @override
   Widget build(BuildContext context) {
+    final authState = ref.watch(authNotifierProvider);
+
     return Scaffold(
       backgroundColor: AppColors.background,
       body: Stack(
@@ -129,10 +156,17 @@ class _SignupScreenState extends State<SignupScreen> {
                             textInputAction: TextInputAction.done,
                             onFieldSubmitted: (_) => _onCreate(),
                           ),
-                          const SizedBox(height: AppSpacing.lg),
+                          const SizedBox(height: AppSpacing.sm),
+
+                          // ── Error message ─────────────────────────────────
+                          if (authState.errorMessage != null)
+                            _ErrorBanner(message: authState.errorMessage!),
+
+                          const SizedBox(height: AppSpacing.md),
                           PrimaryButton(
                             label: 'Create Account',
-                            onPressed: _onCreate,
+                            onPressed: authState.isLoading ? null : _onCreate,
+                            isLoading: authState.isLoading,
                           ),
                         ],
                       ),
@@ -326,6 +360,49 @@ class _AuthCard extends StatelessWidget {
         ],
       ),
       child: child,
+    );
+  }
+}
+
+// ── Error banner ──────────────────────────────────────────────────────────────
+
+class _ErrorBanner extends StatelessWidget {
+  const _ErrorBanner({required this.message});
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.md,
+        vertical: AppSpacing.sm,
+      ),
+      decoration: BoxDecoration(
+        color: AppColors.errorLight,
+        borderRadius: AppRadius.radiusMd,
+        border: Border.all(color: AppColors.error.withAlpha(51)),
+      ),
+      child: Row(
+        children: [
+          const Icon(
+            Icons.error_outline_rounded,
+            size: 16,
+            color: AppColors.error,
+          ),
+          const SizedBox(width: AppSpacing.xs),
+          Expanded(
+            child: Text(
+              message,
+              style: const TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w500,
+                color: AppColors.error,
+                height: 1.4,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../shared/constants/app_colors.dart';
@@ -8,20 +9,25 @@ import '../../../shared/constants/app_strings.dart';
 import '../../../shared/widgets/app_logo.dart';
 import '../../../shared/widgets/custom_text_field.dart';
 import '../../../shared/widgets/primary_button.dart';
+import '../providers/auth_provider.dart';
 
-/// The Login screen — UI Redesign Sprint 2 (refined).
+/// The Login screen.
 ///
-/// Presentation-layer only. Auth logic, navigation, and controllers unchanged.
-/// Back button removed: Login is always the first screen after Splash (go),
-/// so there is no navigation stack to pop back to.
-class LoginScreen extends StatefulWidget {
+/// Presentation-layer only. Auth logic lives in [AuthNotifier] / [AuthRepository].
+/// The screen reads [authNotifierProvider] for loading state and error messages,
+/// and delegates all Firebase calls to [AuthNotifier.signIn].
+///
+/// Navigation is handled entirely by the router's redirect:
+/// when sign-in succeeds, [authStateProvider] emits a non-null [User] and
+/// the router automatically redirects to `/home`.
+class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  ConsumerState<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _LoginScreenState extends ConsumerState<LoginScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
@@ -32,11 +38,22 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  void _onLogin() => context.go('/home');
+  Future<void> _onLogin() async {
+    // Clear any previous error before a new attempt.
+    ref.read(authNotifierProvider.notifier).clearError();
+    await ref.read(authNotifierProvider.notifier).signIn(
+          email: _emailController.text,
+          password: _passwordController.text,
+        );
+    // Navigation is handled by the router redirect — no context.go() needed.
+  }
+
   void _onSignUp() => context.push('/signup');
 
   @override
   Widget build(BuildContext context) {
+    final authState = ref.watch(authNotifierProvider);
+
     return Scaffold(
       backgroundColor: AppColors.background,
       body: Stack(
@@ -124,10 +141,18 @@ class _LoginScreenState extends State<LoginScreen> {
                                   ),
                                 ),
                               ),
-                              const SizedBox(height: AppSpacing.lg),
+                              const SizedBox(height: AppSpacing.sm),
+
+                              // ── Error message ─────────────────────────────
+                              if (authState.errorMessage != null)
+                                _ErrorBanner(message: authState.errorMessage!),
+
+                              const SizedBox(height: AppSpacing.md),
                               PrimaryButton(
                                 label: 'Log in',
-                                onPressed: _onLogin,
+                                onPressed:
+                                    authState.isLoading ? null : _onLogin,
+                                isLoading: authState.isLoading,
                               ),
                             ],
                           ),
@@ -287,6 +312,49 @@ class _AuthCard extends StatelessWidget {
         ],
       ),
       child: child,
+    );
+  }
+}
+
+// ── Error banner ──────────────────────────────────────────────────────────────
+
+class _ErrorBanner extends StatelessWidget {
+  const _ErrorBanner({required this.message});
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.md,
+        vertical: AppSpacing.sm,
+      ),
+      decoration: BoxDecoration(
+        color: AppColors.errorLight,
+        borderRadius: AppRadius.radiusMd,
+        border: Border.all(color: AppColors.error.withAlpha(51)),
+      ),
+      child: Row(
+        children: [
+          const Icon(
+            Icons.error_outline_rounded,
+            size: 16,
+            color: AppColors.error,
+          ),
+          const SizedBox(width: AppSpacing.xs),
+          Expanded(
+            child: Text(
+              message,
+              style: const TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w500,
+                color: AppColors.error,
+                height: 1.4,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

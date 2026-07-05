@@ -5,9 +5,10 @@ import '../../shared/widgets/app_logo.dart';
 
 /// The splash screen.
 ///
-/// Shows the brand mark and tagline, then automatically navigates to the
-/// login screen after a short delay. No animations, no loading indicators,
-/// no network calls — per product spec.
+/// Shows the brand mark and tagline for a fixed delay, then navigates to
+/// `/login`. The router's `redirect` intercepts that and sends authenticated
+/// users directly to `/home` instead — so this screen never needs to know
+/// about auth state.
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
 

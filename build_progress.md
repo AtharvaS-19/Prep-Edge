@@ -310,14 +310,37 @@
 - [x] Today's Snapshot: Created a 2x2 grid displaying Questions Attempted, Accuracy, Bookmarks, and Mistakes counts using real existing providers.
 - [x] Quick Actions & Subjects: Restructured positioning, adjusted margins/spacing, and elevated visual hierarchy of key elements.
 
+## ✅ Sprint 10.1 — Firebase Foundation
+- [x] Added required stable Firebase packages to `pubspec.yaml` (`firebase_core`, `firebase_auth`, `cloud_firestore`, `firebase_storage`).
+- [x] Initialized Firebase in `lib/main.dart` with `WidgetsFlutterBinding.ensureInitialized()` and `await Firebase.initializeApp()` using the CLI-generated `DefaultFirebaseOptions`.
+
+## ✅ Sprint 10.2 — Firebase Authentication
+- [x] Implemented `AuthRepository` wrapping `FirebaseAuth` with user-friendly error mapping.
+- [x] Created `authNotifierProvider` and `authStateProvider` for login, signup, signout actions and persistent auth state monitoring.
+- [x] Implemented GoRouter route guard redirect based on auth state, protecting all shell routes and auto-redirecting authenticated users to Home.
+- [x] Converted Login and Signup screens to `ConsumerStatefulWidget` and wired them to the auth providers for a fully functional Firebase auth flow.
+
+## ✅ Sprint 10.3 — Firestore Database Schema Design
+- [x] Designed collections and document structures for `users`, `bookmarks`, `mistakes`, and `attempts`.
+- [x] Defined all field names, types, relationships, query indexes, and security rule specifications.
+- [x] Outlined the repository mapping and client-side derived data strategy to match the current Riverpod architecture.
+## ✅ Sprint 10.4 — Repository Layer
+- [x] Implemented `UserRepository` and its corresponding Riverpod provider.
+- [x] Implemented `BookmarkRepository` and its corresponding Riverpod provider.
+- [x] Implemented `MistakesRepository` and its corresponding Riverpod provider.
+- [x] Implemented `LearningRepository` and its corresponding Riverpod provider.
+- [x] Designed all repository APIs with Firebase dependencies injected via constructor with singleton fallbacks.
+- [x] Kept all read/write/stream methods as stubbed placeholders with detailed commented serialization code, ready for active integration in the next sprint.
+
 ---
 
 ## Current Task
-**Status:** UI Review Pass — Home Experience completed. Home screen restructured into a high-utility productivity dashboard.
+**Status:** Sprint 10.4 completed. The repository structure and contracts for Firestore integration are fully established.
 **Next file:** TBD
-**Last completed file:** `build_progress.md` — Updated progress documentation to include UI Review Pass — Home Experience.
+**Last completed file:** `lib/features/learning/providers/learning_repository_provider.dart` — Exposed LearningRepository via Riverpod.
 
 ---
+
 
 ## Orphaned Files (delete before shipping)
 - `lib/features/chapters/screens/chapters_screen.dart`
