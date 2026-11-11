@@ -1,9 +1,11 @@
+import 'package:flutter/cupertino.dart' show CupertinoPageTransitionsBuilder;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../shared/constants/app_colors.dart';
 import '../shared/constants/app_radius.dart';
 import '../shared/constants/app_spacing.dart';
+import '../shared/constants/app_text.dart';
 
 /// The app's single source-of-truth [ThemeData].
 ///
@@ -18,6 +20,22 @@ abstract final class AppTheme {
 
     return base.copyWith(
       scaffoldBackgroundColor: AppColors.background,
+      splashFactory: NoSplash.splashFactory,
+      highlightColor: Colors.transparent,
+      visualDensity: VisualDensity.standard,
+      snackBarTheme: SnackBarThemeData(
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: AppColors.textPrimary,
+        contentTextStyle: AppText.callout.copyWith(color: Colors.white),
+        shape: const RoundedRectangleBorder(borderRadius: AppRadius.radiusMd),
+      ),
+      pageTransitionsTheme: const PageTransitionsTheme(builders: {
+        TargetPlatform.android: CupertinoPageTransitionsBuilder(),
+        TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+        TargetPlatform.windows: CupertinoPageTransitionsBuilder(),
+        TargetPlatform.macOS: CupertinoPageTransitionsBuilder(),
+        TargetPlatform.linux: CupertinoPageTransitionsBuilder(),
+      }),
       textTheme: _textTheme,
       appBarTheme: _appBarTheme,
       elevatedButtonTheme: _elevatedButtonTheme,
@@ -133,25 +151,19 @@ abstract final class AppTheme {
   }
 
   // ── AppBar ─────────────────────────────────────────────────────────────────
-  static const AppBarTheme _appBarTheme = AppBarTheme(
+  static AppBarTheme get _appBarTheme => AppBarTheme(
     backgroundColor: AppColors.background,
     foregroundColor: AppColors.textPrimary,
     elevation: 0,
     scrolledUnderElevation: 0,
     centerTitle: false,
-    systemOverlayStyle: SystemUiOverlayStyle(
+    systemOverlayStyle: const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
       statusBarIconBrightness: Brightness.dark,
       statusBarBrightness: Brightness.light,
     ),
-    titleTextStyle: TextStyle(
-      fontFamily: 'Inter',
-      fontSize: 17,
-      fontWeight: FontWeight.w600,
-      letterSpacing: -0.3,
-      color: AppColors.textPrimary,
-    ),
-    iconTheme: IconThemeData(
+    titleTextStyle: AppText.headline,
+    iconTheme: const IconThemeData(
       color: AppColors.textPrimary,
       size: 22,
     ),
@@ -172,12 +184,7 @@ abstract final class AppTheme {
           shape: const RoundedRectangleBorder(
             borderRadius: AppRadius.radiusLg,
           ),
-          textStyle: const TextStyle(
-            fontFamily: 'Inter',
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-            letterSpacing: -0.1,
-          ),
+          textStyle: AppText.button,
         ),
       );
 
@@ -186,17 +193,12 @@ abstract final class AppTheme {
       OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           foregroundColor: AppColors.textPrimary,
-          side: const BorderSide(color: AppColors.border, width: 1.5),
+          side: const BorderSide(color: AppColors.border, width: 1),
           minimumSize: const Size(double.infinity, AppSpacing.buttonHeight),
           shape: const RoundedRectangleBorder(
             borderRadius: AppRadius.radiusLg,
           ),
-          textStyle: const TextStyle(
-            fontFamily: 'Inter',
-            fontSize: 16,
-            fontWeight: FontWeight.w500,
-            letterSpacing: -0.1,
-          ),
+          textStyle: AppText.button.copyWith(fontWeight: FontWeight.w500),
         ),
       );
 
@@ -207,57 +209,42 @@ abstract final class AppTheme {
           padding: EdgeInsets.zero,
           minimumSize: Size.zero,
           tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-          textStyle: const TextStyle(
-            fontFamily: 'Inter',
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-            letterSpacing: -0.1,
-          ),
+          textStyle: AppText.callout.copyWith(fontWeight: FontWeight.w600),
         ),
       );
 
   // ── Input decoration ───────────────────────────────────────────────────────
   static InputDecorationTheme get _inputDecorationTheme =>
-      const InputDecorationTheme(
+      InputDecorationTheme(
         filled: true,
         fillColor: AppColors.cardBackground,
-        contentPadding: EdgeInsets.symmetric(
+        contentPadding: const EdgeInsets.symmetric(
           horizontal: AppSpacing.md,
-          vertical: AppSpacing.lg, // More breathing room — was md
+          vertical: AppSpacing.md,
         ),
-        border: OutlineInputBorder(
+        border: const OutlineInputBorder(
           borderRadius: AppRadius.radiusLg, // Was radiusMd
           borderSide: BorderSide(color: AppColors.border, width: 1),
         ),
-        enabledBorder: OutlineInputBorder(
+        enabledBorder: const OutlineInputBorder(
           borderRadius: AppRadius.radiusLg,
           borderSide: BorderSide(color: AppColors.border, width: 1),
         ),
-        focusedBorder: OutlineInputBorder(
+        focusedBorder: const OutlineInputBorder(
           borderRadius: AppRadius.radiusLg,
           borderSide:
-              BorderSide(color: AppColors.borderFocused, width: 2), // Was 1.5
+              BorderSide(color: AppColors.borderFocused, width: 1.5),
         ),
-        errorBorder: OutlineInputBorder(
+        errorBorder: const OutlineInputBorder(
           borderRadius: AppRadius.radiusLg,
           borderSide: BorderSide(color: AppColors.error, width: 1),
         ),
-        focusedErrorBorder: OutlineInputBorder(
+        focusedErrorBorder: const OutlineInputBorder(
           borderRadius: AppRadius.radiusLg,
-          borderSide: BorderSide(color: AppColors.error, width: 2),
+          borderSide: BorderSide(color: AppColors.error, width: 1.5),
         ),
-        hintStyle: TextStyle(
-          fontFamily: 'Inter',
-          fontSize: 15,
-          fontWeight: FontWeight.w400,
-          color: AppColors.textTertiary,
-        ),
-        labelStyle: TextStyle(
-          fontFamily: 'Inter',
-          fontSize: 13,
-          fontWeight: FontWeight.w500,
-          color: AppColors.textPrimary,
-        ),
+        hintStyle: AppText.body.copyWith(color: AppColors.textTertiary),
+        labelStyle: AppText.callout,
       );
 
   // ── Card ───────────────────────────────────────────────────────────────────
@@ -285,7 +272,7 @@ abstract final class AppTheme {
       ProgressIndicatorThemeData(
     color: AppColors.primary,
     linearTrackColor: AppColors.progressTrack,
-    linearMinHeight: 5, // Slightly slimmer for a premium look
+    linearMinHeight: 5,
   );
 
   // Prevent instantiation

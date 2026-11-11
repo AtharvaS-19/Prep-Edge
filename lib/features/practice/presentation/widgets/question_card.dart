@@ -1,16 +1,19 @@
 import 'package:flutter/material.dart';
 import '../../models/question.dart';
 import '../../../../shared/constants/app_colors.dart';
+import '../../../../shared/constants/app_motion.dart';
 import '../../../../shared/constants/app_radius.dart';
 import '../../../../shared/constants/app_spacing.dart';
+import '../../../../shared/constants/app_text.dart';
+import '../../../../shared/widgets/pressable.dart';
 
-/// Renders a single MCQ question with four selectable options.
+/// Renders a single MCQ question with its selectable options.
 ///
 /// State is managed externally — this widget is purely presentational.
 /// [selectedIndex] = null means no answer chosen yet.
 /// [isSubmitted] locks the options and reveals correct/incorrect colours.
-/// [isBookmarked] is accepted for API completeness — bookmark UI lives in
-/// the AppBar, not inside this card.
+/// [isBookmarked] is accepted for API completeness — the bookmark toggle lives
+/// in the AppBar, not inside this card.
 class QuestionCard extends StatelessWidget {
   const QuestionCard({
     super.key,
@@ -25,9 +28,6 @@ class QuestionCard extends StatelessWidget {
   final int? selectedIndex;
   final bool isSubmitted;
   final ValueChanged<int> onOptionSelected;
-
-  /// Whether this question is currently bookmarked.
-  /// The bookmark toggle UI lives in [PracticeScreen]'s AppBar, not here.
   final bool isBookmarked;
 
   @override
@@ -35,24 +35,21 @@ class QuestionCard extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Question text
         Text(
           question.text,
-          style: const TextStyle(
-            fontSize: 16,
+          style: AppText.headline.copyWith(
+            fontSize: 17,
             fontWeight: FontWeight.w500,
-            color: AppColors.textPrimary,
-            height: 1.6,
-            letterSpacing: -0.2,
+            height: 1.55,
+            letterSpacing: -0.3,
           ),
         ),
         const SizedBox(height: AppSpacing.xl),
-        // Options
         ...List.generate(question.options.length, (index) {
           return Padding(
             padding: EdgeInsets.only(
               bottom:
-                  index < question.options.length - 1 ? AppSpacing.cardGap : 0,
+                  index < question.options.length - 1 ? AppSpacing.sm : 0,
             ),
             child: _OptionTile(
               index: index,
@@ -99,14 +96,12 @@ class _OptionTile extends StatelessWidget {
         border: isSelected ? AppColors.primary : AppColors.border,
         labelBackground:
             isSelected ? AppColors.primary : AppColors.cardBackgroundAlt,
-        labelColor:
-            isSelected ? AppColors.textOnPrimary : AppColors.textTertiary,
+        labelColor: isSelected ? Colors.white : AppColors.textSecondary,
         textColor: AppColors.textPrimary,
         borderWidth: isSelected ? 1.5 : 1.0,
       );
     }
 
-    // After submission
     final bool isCorrect = index == correctIndex;
     final bool isWrongSelected = selectedIndex == index && !isCorrect;
 
@@ -120,7 +115,6 @@ class _OptionTile extends StatelessWidget {
         borderWidth: 1.5,
       );
     }
-
     if (isWrongSelected) {
       return const _OptionStyle(
         background: AppColors.errorLight,
@@ -131,8 +125,6 @@ class _OptionTile extends StatelessWidget {
         borderWidth: 1.5,
       );
     }
-
-    // Unselected, not correct — dim
     return const _OptionStyle(
       background: AppColors.cardBackground,
       border: AppColors.border,
@@ -147,13 +139,16 @@ class _OptionTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final style = _style;
 
-    return GestureDetector(
+    return Pressable(
       onTap: onTap,
-      behavior: HitTestBehavior.opaque,
+      scale: 0.99,
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 180),
-        curve: Curves.easeOut,
-        padding: const EdgeInsets.all(AppSpacing.md),
+        duration: AppMotion.base,
+        curve: AppMotion.standard,
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.md,
+          vertical: 14,
+        ),
         decoration: BoxDecoration(
           color: style.background,
           borderRadius: AppRadius.radiusLg,
@@ -161,48 +156,42 @@ class _OptionTile extends StatelessWidget {
         ),
         child: Row(
           children: [
-            // Option label circle
             AnimatedContainer(
-              duration: const Duration(milliseconds: 180),
+              duration: AppMotion.base,
               width: 28,
               height: 28,
               decoration: BoxDecoration(
                 color: style.labelBackground,
-                borderRadius: BorderRadius.circular(7),
+                shape: BoxShape.circle,
               ),
               alignment: Alignment.center,
               child: Text(
                 _labels[index],
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w700,
+                style: AppText.captionStrong.copyWith(
                   color: style.labelColor,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
             ),
-            const SizedBox(width: AppSpacing.sm),
+            const SizedBox(width: AppSpacing.md),
             Expanded(
               child: Text(
                 text,
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w400,
-                  color: style.textColor,
-                  height: 1.4,
-                ),
+                style: AppText.body
+                    .copyWith(color: style.textColor, height: 1.4),
               ),
             ),
             if (isSubmitted && index == correctIndex)
               const Padding(
-                padding: EdgeInsets.only(left: AppSpacing.xs),
+                padding: EdgeInsets.only(left: AppSpacing.sm),
                 child: Icon(Icons.check_circle_rounded,
-                    size: 16, color: AppColors.success),
+                    size: 20, color: AppColors.success),
               ),
             if (isSubmitted && selectedIndex == index && index != correctIndex)
               const Padding(
-                padding: EdgeInsets.only(left: AppSpacing.xs),
+                padding: EdgeInsets.only(left: AppSpacing.sm),
                 child: Icon(Icons.cancel_rounded,
-                    size: 16, color: AppColors.error),
+                    size: 20, color: AppColors.error),
               ),
           ],
         ),
@@ -211,7 +200,6 @@ class _OptionTile extends StatelessWidget {
   }
 }
 
-/// Visual style descriptor for an option tile.
 class _OptionStyle {
   const _OptionStyle({
     required this.background,

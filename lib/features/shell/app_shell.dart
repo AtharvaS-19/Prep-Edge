@@ -1,29 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import '../../shared/constants/app_colors.dart';
-import '../../shared/constants/app_radius.dart';
-import '../../shared/constants/app_spacing.dart';
+import '../../shared/constants/app_motion.dart';
+import '../../shared/constants/app_text.dart';
 
 /// The persistent application shell.
 ///
-/// Rendered once for the lifetime of the app session. GoRouter's [ShellRoute]
-/// swaps the [child] (the active tab's screen) while this scaffold and its
-/// bottom navigation remain mounted and never rebuild on tab switch.
-///
-/// State preservation: each tab's subtree stays alive via [IndexedStack],
-/// so scroll positions, form input, and local state survive tab switches.
-class AppShell extends StatefulWidget {
+/// GoRouter's [ShellRoute] swaps [child] (the active tab's screen) while this
+/// scaffold and its bottom navigation stay mounted. The bar hides itself on
+/// focused flows (practice / result) so it never stacks with their own
+/// bottom action bar.
+class AppShell extends StatelessWidget {
   const AppShell({super.key, required this.child});
 
   /// The currently active tab's screen, injected by GoRouter's ShellRoute.
   final Widget child;
 
-  @override
-  State<AppShell> createState() => _AppShellState();
-}
-
-class _AppShellState extends State<AppShell> {
-  // Maps a tab index to its root route path.
   static const List<_TabDestination> _destinations = [
     _TabDestination(
       path: '/home',
@@ -39,7 +32,7 @@ class _AppShellState extends State<AppShell> {
     ),
     _TabDestination(
       path: '/bookmarks',
-      label: 'Bookmarks',
+      label: 'Saved',
       icon: Icons.bookmark_outline_rounded,
       selectedIcon: Icons.bookmark_rounded,
     ),
@@ -57,47 +50,46 @@ class _AppShellState extends State<AppShell> {
     ),
   ];
 
-  int _activeIndex = 0;
-
-  /// Derives the selected index from the current router location so that
-  /// deep-links and programmatic navigation keep the bar in sync.
-  int _locationToIndex(String location) {
+  /// Derives the selected index from the current router location.
+  static int _locationToIndex(String location) {
     for (int i = 0; i < _destinations.length; i++) {
       if (location.startsWith(_destinations[i].path)) return i;
     }
     return 0;
   }
 
-  void _onTabTapped(int index) {
-    if (index == _activeIndex) return; // already active — no-op
-    setState(() => _activeIndex = index);
-    context.go(_destinations[index].path);
-  }
+  /// Focused flows own the full screen.
+  static bool _isFocusedFlow(String location) =>
+      location.contains('/practice') || location.contains('/result');
 
   @override
   Widget build(BuildContext context) {
-    // Keep the bar in sync when navigating programmatically.
     final String location = GoRouterState.of(context).uri.toString();
-    _activeIndex = _locationToIndex(location);
+    final int activeIndex = _locationToIndex(location);
+    final bool showBar = !_isFocusedFlow(location);
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      // extendBody allows the scroll content to flow behind the floating nav bar.
-      extendBody: true,
-      body: widget.child,
-      bottomNavigationBar: _FloatingNavBar(
-        selectedIndex: _activeIndex,
-        destinations: _destinations,
-        onDestinationSelected: _onTabTapped,
-      ),
+      body: child,
+      bottomNavigationBar: showBar
+          ? _NavBar(
+              selectedIndex: activeIndex,
+              destinations: _destinations,
+              onDestinationSelected: (index) {
+                if (index == activeIndex) return;
+                HapticFeedback.selectionClick();
+                context.go(_destinations[index].path);
+              },
+            )
+          : null,
     );
   }
 }
 
-// ── Floating navigation bar ────────────────────────────────────────────────────
+// ── Navigation bar ─────────────────────────────────────────────────────────────
 
-class _FloatingNavBar extends StatelessWidget {
-  const _FloatingNavBar({
+class _NavBar extends StatelessWidget {
+  const _NavBar({
     required this.selectedIndex,
     required this.destinations,
     required this.onDestinationSelected,
@@ -109,52 +101,24 @@ class _FloatingNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Bottom padding respects the system navigation bar / home indicator.
-    final double bottomInset = MediaQuery.of(context).padding.bottom;
-
-    return Padding(
-      padding: EdgeInsets.fromLTRB(
-        AppSpacing.md,
-        0,
-        AppSpacing.md,
-        (bottomInset > 0 ? bottomInset : AppSpacing.md) + AppSpacing.xs,
+    return DecoratedBox(
+      decoration: const BoxDecoration(
+        color: AppColors.cardBackground,
+        border: Border(top: BorderSide(color: AppColors.border)),
       ),
-      child: Container(
-        height: 68,
-        decoration: BoxDecoration(
-          color: AppColors.navBarSurface,
-          borderRadius: AppRadius.radiusXxl,
-          border: Border.all(
-            color: AppColors.border,
-            width: 1,
-          ),
-          boxShadow: const [
-            BoxShadow(
-              color: Color(0x14000000), // ~8% black
-              blurRadius: 24,
-              offset: Offset(0, 8),
-              spreadRadius: 0,
-            ),
-            BoxShadow(
-              color: Color(0x0A000000), // ~4% black — secondary soft layer
-              blurRadius: 8,
-              offset: Offset(0, 2),
-              spreadRadius: 0,
-            ),
-          ],
-        ),
-        child: ClipRRect(
-          borderRadius: AppRadius.radiusXxl,
+      child: SafeArea(
+        top: false,
+        child: SizedBox(
+          height: 58,
           child: Row(
-            children: List.generate(destinations.length, (index) {
-              final dest = destinations[index];
-              final bool isSelected = index == selectedIndex;
-              return _NavBarItem(
-                destination: dest,
-                isSelected: isSelected,
-                onTap: () => onDestinationSelected(index),
-              );
-            }),
+            children: [
+              for (int i = 0; i < destinations.length; i++)
+                _NavItem(
+                  destination: destinations[i],
+                  isSelected: i == selectedIndex,
+                  onTap: () => onDestinationSelected(i),
+                ),
+            ],
           ),
         ),
       ),
@@ -162,10 +126,8 @@ class _FloatingNavBar extends StatelessWidget {
   }
 }
 
-// ── Individual nav bar item ────────────────────────────────────────────────────
-
-class _NavBarItem extends StatelessWidget {
-  const _NavBarItem({
+class _NavItem extends StatelessWidget {
+  const _NavItem({
     required this.destination,
     required this.isSelected,
     required this.onTap,
@@ -177,58 +139,50 @@ class _NavBarItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Color iconColor =
-        isSelected ? AppColors.primary : AppColors.textTertiary;
-    final Color labelColor =
+    final Color color =
         isSelected ? AppColors.primary : AppColors.textTertiary;
 
     return Expanded(
-      child: GestureDetector(
-        onTap: onTap,
-        behavior: HitTestBehavior.opaque,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // Selected indicator pill above icon
-            AnimatedContainer(
-              duration: const Duration(milliseconds: 180),
-              curve: Curves.easeOut,
-              width: isSelected ? 32 : 0,
-              height: 3,
-              margin: const EdgeInsets.only(bottom: AppSpacing.xxs),
-              decoration: BoxDecoration(
-                color: isSelected ? AppColors.primary : Colors.transparent,
-                borderRadius: AppRadius.radiusFull,
+      child: Semantics(
+        button: true,
+        selected: isSelected,
+        label: destination.label,
+        child: GestureDetector(
+          onTap: onTap,
+          behavior: HitTestBehavior.opaque,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              AnimatedSwitcher(
+                duration: AppMotion.fast,
+                child: Icon(
+                  isSelected ? destination.selectedIcon : destination.icon,
+                  key: ValueKey<bool>(isSelected),
+                  size: 24,
+                  color: color,
+                ),
               ),
-            ),
-            Icon(
-              isSelected ? destination.selectedIcon : destination.icon,
-              size: 22,
-              color: iconColor,
-            ),
-            const SizedBox(height: 3),
-            Text(
-              destination.label,
-              style: TextStyle(
-                fontFamily: 'Inter',
-                fontSize: 10,
-                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
-                color: labelColor,
-                letterSpacing: 0.1,
+              const SizedBox(height: 3),
+              AnimatedDefaultTextStyle(
+                duration: AppMotion.fast,
+                style: AppText.micro.copyWith(
+                  color: color,
+                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                ),
+                child: Text(
+                  destination.label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
   }
 }
 
-// ── Data model ─────────────────────────────────────────────────────────────────
-
-/// Immutable descriptor for a single bottom-navigation destination.
 class _TabDestination {
   const _TabDestination({
     required this.path,

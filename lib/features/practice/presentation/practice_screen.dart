@@ -12,6 +12,8 @@ import 'package:exam_prep_app/features/practice/presentation/widgets/question_ca
 import 'package:exam_prep_app/features/practice/presentation/widgets/question_progress_bar.dart';
 import '../../../../shared/constants/app_colors.dart';
 import '../../../../shared/constants/app_spacing.dart';
+import '../../../../shared/constants/app_text.dart';
+import '../../../../shared/widgets/empty_state.dart';
 import '../../../../shared/widgets/primary_button.dart';
 
 /// The Practice Screen — Phase 4 core feature, extended in Phases 5, 6 & 7.
@@ -206,9 +208,12 @@ class _PracticeScreenState extends ConsumerState<PracticeScreen> {
       backgroundColor: AppColors.background,
       appBar: AppBar(
         backgroundColor: AppColors.background,
+        titleSpacing: 0,
         title: Text(
           widget.chapterTitle,
-          style: const TextStyle(fontSize: 16),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: AppText.headline,
         ),
         actions: [
           // ── Bookmark toggle ──────────────────────────────────────────────
@@ -227,8 +232,8 @@ class _PracticeScreenState extends ConsumerState<PracticeScreen> {
                     : Icons.bookmark_outline_rounded,
                 key: ValueKey<bool>(isBookmarked),
                 color:
-                    isBookmarked ? AppColors.primary : AppColors.iconSecondary,
-                size: 22,
+                    isBookmarked ? AppColors.primary : AppColors.iconPrimary,
+                size: 24,
               ),
             ),
           ),
@@ -237,19 +242,19 @@ class _PracticeScreenState extends ConsumerState<PracticeScreen> {
             padding: const EdgeInsets.only(right: AppSpacing.md),
             child: Center(
               child: Text(
-                '${_results.length} / ${_questions.length}',
-                style: const TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w500,
-                  color: AppColors.textSecondary,
-                ),
+                '${_results.length}/${_questions.length} done',
+                style: AppText.caption,
               ),
             ),
           ),
         ],
       ),
       body: SafeArea(
-        child: Column(
+        child: Align(
+          alignment: Alignment.topCenter,
+          child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 680),
+          child: Column(
           children: [
             // Progress bar — pinned
             Padding(
@@ -293,13 +298,14 @@ class _PracticeScreenState extends ConsumerState<PracticeScreen> {
                         selectedIndex: _selectedOptionIndex!,
                       ),
                     ],
-                    // Space for the bottom action bar
-                    const SizedBox(height: 80),
+                    const SizedBox(height: AppSpacing.xl),
                   ],
                 ),
               ),
             ),
           ],
+        ),
+        ),
         ),
       ),
       // Fixed bottom action bar
@@ -336,28 +342,32 @@ class _BottomActionBar extends StatelessWidget {
     return Container(
       padding: EdgeInsets.fromLTRB(
         AppSpacing.screenHorizontal,
-        AppSpacing.md,
+        AppSpacing.sm + 2,
         AppSpacing.screenHorizontal,
-        AppSpacing.md + MediaQuery.of(context).padding.bottom,
+        AppSpacing.sm + 2 + MediaQuery.of(context).padding.bottom,
       ),
       decoration: const BoxDecoration(
-        color: AppColors.background,
+        color: AppColors.cardBackground,
         border: Border(
           top: BorderSide(color: AppColors.border, width: 1),
         ),
       ),
-      child: !isSubmitted
-          ? PrimaryButton(
-              label: 'Submit answer',
-              onPressed: canSubmit ? onSubmit : null,
-            )
-          : PrimaryButton(
-              label: isLastQuestion ? 'See results' : 'Next question',
-              onPressed: onNext,
-              icon: isLastQuestion
-                  ? Icons.bar_chart_rounded
-                  : Icons.arrow_forward_rounded,
-            ),
+      child: Center(
+        heightFactor: 1,
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 680),
+          child: !isSubmitted
+              ? PrimaryButton(
+                  label: 'Submit answer',
+                  onPressed: canSubmit ? onSubmit : null,
+                )
+              : PrimaryButton(
+                  label: isLastQuestion ? 'See results' : 'Next question',
+                  onPressed: onNext,
+                  icon: Icons.arrow_forward_rounded,
+                ),
+        ),
+      ),
     );
   }
 }
@@ -372,36 +382,10 @@ class _EmptyQuestionsScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(backgroundColor: AppColors.background),
-      body: const Center(
-        child: Padding(
-          padding: EdgeInsets.all(AppSpacing.xxl),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(Icons.quiz_outlined,
-                  size: 40, color: AppColors.iconSecondary),
-              SizedBox(height: AppSpacing.md),
-              Text(
-                'No questions available',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.textPrimary,
-                ),
-              ),
-              SizedBox(height: AppSpacing.xs),
-              Text(
-                'Questions for this chapter are being added.',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 13,
-                  color: AppColors.textSecondary,
-                  height: 1.5,
-                ),
-              ),
-            ],
-          ),
-        ),
+      body: const EmptyState(
+        icon: Icons.quiz_outlined,
+        title: 'No questions yet',
+        message: 'Questions for this chapter are being added.',
       ),
     );
   }

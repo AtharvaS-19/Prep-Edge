@@ -7,8 +7,13 @@ import '../../catalog/providers/catalog_provider.dart';
 import '../../learning/models/chapter_progress.dart';
 import '../../learning/providers/chapter_progress_provider.dart';
 import '../../../shared/constants/app_colors.dart';
+import '../../../shared/constants/app_motion.dart';
 import '../../../shared/constants/app_radius.dart';
 import '../../../shared/constants/app_spacing.dart';
+import '../../../shared/constants/app_text.dart';
+import '../../../shared/widgets/app_card.dart';
+import '../../../shared/widgets/empty_state.dart';
+import '../../../shared/widgets/pressable.dart';
 import 'widgets/subject_progress_card.dart';
 import 'widgets/chapter_card.dart';
 
@@ -18,9 +23,9 @@ enum ChapterFilter { all, inProgress, completed, notStarted }
 extension ChapterFilterLabel on ChapterFilter {
   String get label => switch (this) {
         ChapterFilter.all => 'All',
-        ChapterFilter.inProgress => 'In Progress',
+        ChapterFilter.inProgress => 'In progress',
         ChapterFilter.completed => 'Completed',
-        ChapterFilter.notStarted => 'Not Started',
+        ChapterFilter.notStarted => 'Not started',
       };
 }
 
@@ -28,7 +33,7 @@ extension ChapterFilterLabel on ChapterFilter {
 ///
 /// Displays overall subject progress (live from Learning Engine), a search bar,
 /// filter chips, and the full chapter list. Filter logic is driven by live
-/// [ChapterProgress] so "In Progress" / "Completed" reflect actual attempts.
+/// [ChapterProgress] so "In progress" / "Completed" reflect actual attempts.
 class ChapterDashboardScreen extends ConsumerStatefulWidget {
   const ChapterDashboardScreen({super.key, required this.subjectId});
 
@@ -73,14 +78,12 @@ class _ChapterDashboardScreenState
   List<Chapter> _filteredChapters() {
     Iterable<Chapter> result = _allChapters;
 
-    // Apply search
     if (_searchQuery.isNotEmpty) {
       result = result.where(
         (c) => c.title.toLowerCase().contains(_searchQuery),
       );
     }
 
-    // Apply filter using live ChapterProgress
     result = switch (_activeFilter) {
       ChapterFilter.all => result,
       ChapterFilter.inProgress => result.where((c) {
@@ -109,11 +112,10 @@ class _ChapterDashboardScreenState
     if (_subject == null) {
       return Scaffold(
         appBar: AppBar(backgroundColor: AppColors.background),
-        body: const Center(
-          child: Text(
-            'Subject not found.',
-            style: TextStyle(color: AppColors.textSecondary),
-          ),
+        body: const EmptyState(
+          icon: Icons.search_off_rounded,
+          title: 'Subject not found',
+          message: 'This subject is no longer available.',
         ),
       );
     }
@@ -129,127 +131,82 @@ class _ChapterDashboardScreenState
         title: Text(_subject!.name),
       ),
       body: SafeArea(
-        child: CustomScrollView(
-          slivers: [
-            // ── Progress card ────────────────────────────────────────────────
-            SliverPadding(
-              padding: const EdgeInsets.fromLTRB(
-                AppSpacing.screenHorizontal,
-                AppSpacing.md,
-                AppSpacing.screenHorizontal,
-                0,
-              ),
-              sliver: SliverToBoxAdapter(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _SubjectIntro(subject: _subject!),
-                    const SizedBox(height: AppSpacing.lg),
-                    SubjectProgressCard(
-                      subjectProgress: subjectProgress,
-                      accentColor: _subject!.accentColor,
-                      totalChapters: _allChapters.length,
+        bottom: false,
+        child: Align(
+          alignment: Alignment.topCenter,
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 640),
+            child: CustomScrollView(
+              slivers: [
+                SliverPadding(
+                  padding: const EdgeInsets.fromLTRB(
+                    AppSpacing.screenHorizontal,
+                    AppSpacing.xs,
+                    AppSpacing.screenHorizontal,
+                    0,
+                  ),
+                  sliver: SliverToBoxAdapter(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SubjectProgressCard(
+                          subjectProgress: subjectProgress,
+                          accentColor: _subject!.accentColor,
+                          totalChapters: _allChapters.length,
+                        ),
+                        const SizedBox(height: AppSpacing.lg),
+                        _SearchBar(controller: _searchController),
+                        const SizedBox(height: AppSpacing.sm),
+                        _FilterChips(
+                          active: _activeFilter,
+                          onChanged: (f) => setState(() => _activeFilter = f),
+                        ),
+                        const SizedBox(height: AppSpacing.md),
+                      ],
                     ),
-                    const SizedBox(height: AppSpacing.xl),
-                    // ── Search bar ───────────────────────────────────────────
-                    _SearchBar(controller: _searchController),
-                    const SizedBox(height: AppSpacing.sm),
-                    // ── Filter chips ─────────────────────────────────────────
-                    _FilterChips(
-                      active: _activeFilter,
-                      onChanged: (f) => setState(() => _activeFilter = f),
-                    ),
-                    const SizedBox(height: AppSpacing.md),
-                  ],
+                  ),
                 ),
-              ),
-            ),
-
-            // ── Chapter list ─────────────────────────────────────────────────
-            filtered.isEmpty
-                ? const SliverFillRemaining(
+                if (filtered.isEmpty)
+                  const SliverFillRemaining(
                     hasScrollBody: false,
-                    child: _EmptyState(),
+                    child: EmptyState(
+                      icon: Icons.search_off_rounded,
+                      title: 'No chapters found',
+                      message: 'Try a different search or filter.',
+                    ),
                   )
-                : SliverPadding(
+                else
+                  SliverPadding(
                     padding: const EdgeInsets.fromLTRB(
                       AppSpacing.screenHorizontal,
                       0,
                       AppSpacing.screenHorizontal,
                       AppSpacing.xxl,
                     ),
-                    sliver: SliverList.separated(
-                      itemCount: filtered.length,
-                      separatorBuilder: (_, __) =>
-                          const SizedBox(height: AppSpacing.cardGap),
-                      itemBuilder: (context, index) {
-                        final chapter = filtered[index];
-                        // Show original 1-based index for numbering
-                        final originalIndex = _allChapters.indexOf(chapter) + 1;
-                        final progress = _progressFor(chapter.id);
-                        return ChapterCard(
-                          key: ValueKey(chapter.id),
-                          chapter: chapter,
-                          accentColor: _subject!.accentColor,
-                          index: originalIndex,
-                          progress: progress,
-                          onTap: () => _onChapterTapped(chapter),
-                        );
-                      },
+                    sliver: SliverToBoxAdapter(
+                      child: AppGroup(
+                        dividerInset: AppSpacing.md + 28,
+                        children: [
+                          for (final chapter in filtered)
+                            ChapterCard(
+                              key: ValueKey(chapter.id),
+                              chapter: chapter,
+                              accentColor: _subject!.accentColor,
+                              // Original 1-based index keeps numbering stable
+                              // while filtering.
+                              index: _allChapters.indexOf(chapter) + 1,
+                              progress: _progressFor(chapter.id),
+                              onTap: () => _onChapterTapped(chapter),
+                            ),
+                        ],
+                      ),
                     ),
                   ),
-          ],
+              ],
+            ),
+          ),
         ),
       ),
-    );
-  }
-}
-
-// ── Subject intro ─────────────────────────────────────────────────────────────
-
-class _SubjectIntro extends StatelessWidget {
-  const _SubjectIntro({required this.subject});
-  final SubjectModel subject;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Container(
-          width: 44,
-          height: 44,
-          decoration: BoxDecoration(
-            color: subject.accentColor.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Icon(subject.icon, size: 20, color: subject.accentColor),
-        ),
-        const SizedBox(width: AppSpacing.sm),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                subject.name,
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.textPrimary,
-                  letterSpacing: -0.4,
-                ),
-              ),
-              const Text(
-                'Complete chapter-wise previous year questions',
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w400,
-                  color: AppColors.textTertiary,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
     );
   }
 }
@@ -265,44 +222,39 @@ class _SearchBar extends StatelessWidget {
     return TextField(
       controller: controller,
       textInputAction: TextInputAction.search,
-      style: const TextStyle(
-        fontSize: 14,
-        fontWeight: FontWeight.w400,
-        color: AppColors.textPrimary,
-      ),
+      cursorColor: AppColors.primary,
+      style: AppText.callout.copyWith(fontWeight: FontWeight.w400),
       decoration: InputDecoration(
-        hintText: 'Search chapters…',
-        hintStyle: const TextStyle(
-          fontSize: 14,
-          color: AppColors.textTertiary,
-          fontWeight: FontWeight.w400,
-        ),
+        hintText: 'Search chapters',
+        hintStyle: AppText.callout
+            .copyWith(color: AppColors.textTertiary, fontWeight: FontWeight.w400),
         prefixIcon: const Padding(
-          padding: EdgeInsets.symmetric(horizontal: AppSpacing.sm),
+          padding: EdgeInsets.only(left: AppSpacing.md, right: AppSpacing.sm),
           child: Icon(Icons.search_rounded,
-              size: 18, color: AppColors.iconSecondary),
+              size: 20, color: AppColors.iconSecondary),
         ),
-        prefixIconConstraints:
-            const BoxConstraints(minWidth: 44, minHeight: 44),
+        prefixIconConstraints: const BoxConstraints(minWidth: 0, minHeight: 0),
         suffixIcon: ValueListenableBuilder<TextEditingValue>(
           valueListenable: controller,
           builder: (_, value, __) {
             if (value.text.isEmpty) return const SizedBox.shrink();
-            return GestureDetector(
+            return Pressable(
               onTap: controller.clear,
               child: const Padding(
-                padding: EdgeInsets.symmetric(horizontal: AppSpacing.sm),
+                padding: EdgeInsets.symmetric(horizontal: AppSpacing.md),
                 child: Icon(Icons.close_rounded,
-                    size: 16, color: AppColors.iconSecondary),
+                    size: 18, color: AppColors.iconSecondary),
               ),
             );
           },
         ),
+        suffixIconConstraints: const BoxConstraints(minWidth: 0, minHeight: 0),
         filled: true,
         fillColor: AppColors.cardBackground,
+        isDense: true,
         contentPadding: const EdgeInsets.symmetric(
           horizontal: AppSpacing.md,
-          vertical: AppSpacing.sm,
+          vertical: 13,
         ),
         border: const OutlineInputBorder(
           borderRadius: AppRadius.radiusLg,
@@ -314,7 +266,7 @@ class _SearchBar extends StatelessWidget {
         ),
         focusedBorder: const OutlineInputBorder(
           borderRadius: AppRadius.radiusLg,
-          borderSide: BorderSide(color: AppColors.borderFocused, width: 2),
+          borderSide: BorderSide(color: AppColors.borderFocused, width: 1.5),
         ),
       ),
     );
@@ -338,91 +290,32 @@ class _FilterChips extends StatelessWidget {
           final bool isActive = filter == active;
           return Padding(
             padding: const EdgeInsets.only(right: AppSpacing.xs),
-            child: GestureDetector(
+            child: Pressable(
               onTap: () => onChanged(filter),
               child: AnimatedContainer(
-                duration: const Duration(milliseconds: 160),
+                duration: AppMotion.fast,
                 padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.sm,
-                  vertical: 6,
+                  horizontal: AppSpacing.md,
+                  vertical: 8,
                 ),
                 decoration: BoxDecoration(
                   color:
-                      isActive ? AppColors.primary : AppColors.cardBackground,
+                      isActive ? AppColors.textPrimary : AppColors.cardBackground,
                   borderRadius: AppRadius.radiusFull,
                   border: Border.all(
-                    color: isActive ? AppColors.primary : AppColors.border,
-                    width: isActive ? 1.5 : 0.75,
+                    color: isActive ? AppColors.textPrimary : AppColors.border,
                   ),
                 ),
                 child: Text(
                   filter.label,
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
-                    color: isActive
-                        ? AppColors.textOnPrimary
-                        : AppColors.textSecondary,
-                    letterSpacing: -0.1,
+                  style: AppText.captionStrong.copyWith(
+                    color: isActive ? Colors.white : AppColors.textSecondary,
                   ),
                 ),
               ),
             ),
           );
         }).toList(),
-      ),
-    );
-  }
-}
-
-// ── Empty state ───────────────────────────────────────────────────────────────
-
-class _EmptyState extends StatelessWidget {
-  const _EmptyState();
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.xxl),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 52,
-              height: 52,
-              decoration: BoxDecoration(
-                color: AppColors.cardBackground,
-                borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: AppColors.border),
-              ),
-              child: const Icon(
-                Icons.search_off_rounded,
-                size: 24,
-                color: AppColors.iconSecondary,
-              ),
-            ),
-            const SizedBox(height: AppSpacing.md),
-            const Text(
-              'No chapters found',
-              style: TextStyle(
-                fontSize: 15,
-                fontWeight: FontWeight.w600,
-                color: AppColors.textPrimary,
-                letterSpacing: -0.2,
-              ),
-            ),
-            const SizedBox(height: AppSpacing.xxs),
-            const Text(
-              'Try a different search or filter.',
-              style: TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w400,
-                color: AppColors.textSecondary,
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }

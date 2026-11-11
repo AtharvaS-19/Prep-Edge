@@ -2,15 +2,12 @@ import 'package:flutter/material.dart';
 import '../constants/app_colors.dart';
 import '../constants/app_spacing.dart';
 import '../constants/app_strings.dart';
+import '../constants/app_text.dart';
 
 /// The brand mark for the app.
 ///
-/// [size] controls the icon container size (applied to both width and height).
-/// [showLabel] adds the "PrepEdge" wordmark text below the icon.
-/// [showTagline] adds the tagline below the name (only when [showLabel] is true).
-///
-/// Uses the real `assets/branding/logo_icon.png` asset.
-/// Every screen that renders AppLogo automatically inherits the real brand.
+/// [size] controls the icon size, [showLabel] adds the wordmark text below
+/// and [showTagline] adds the tagline (only when [showLabel] is true).
 class AppLogo extends StatelessWidget {
   const AppLogo({
     super.key,
@@ -28,35 +25,27 @@ class AppLogo extends StatelessWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        // Real brand icon — swapped from placeholder Container
         Image.asset(
           'assets/branding/logo_icon.png',
           width: size,
           height: size,
           fit: BoxFit.contain,
-          // Graceful fallback while asset loads or if path is wrong in a test
           errorBuilder: (_, __, ___) => _LogoMarkFallback(size: size),
         ),
         if (showLabel) ...[
           const SizedBox(height: AppSpacing.sm),
           Text(
             AppStrings.appName,
-            style: TextStyle(
-              fontSize: size * 0.45,
-              fontWeight: FontWeight.w700,
-              color: AppColors.textPrimary,
-              letterSpacing: -0.5,
-            ),
+            style: AppText.title.copyWith(fontSize: size * 0.4),
           ),
           if (showTagline) ...[
             const SizedBox(height: AppSpacing.xxs),
-            const Text(
+            Text(
               AppStrings.appTagline,
               textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w400,
+              style: AppText.callout.copyWith(
                 color: AppColors.textSecondary,
+                fontWeight: FontWeight.w400,
               ),
             ),
           ],
@@ -66,9 +55,7 @@ class AppLogo extends StatelessWidget {
   }
 }
 
-/// Fallback rendered only when the image asset cannot be loaded
-/// (e.g. in unit-test environments without asset bundles).
-/// Matches the original placeholder visual so tests don't break.
+/// Fallback rendered only when the image asset cannot be loaded.
 class _LogoMarkFallback extends StatelessWidget {
   const _LogoMarkFallback({required this.size});
 
@@ -81,18 +68,13 @@ class _LogoMarkFallback extends StatelessWidget {
       height: size,
       decoration: BoxDecoration(
         color: AppColors.primary,
-        borderRadius: BorderRadius.circular(size * 0.214), // ≈ radiusMd ratio
+        borderRadius: BorderRadius.circular(size * 0.25),
       ),
-      child: Center(
-        child: Text(
-          'P',
-          style: TextStyle(
-            fontSize: size * 0.50,
-            fontWeight: FontWeight.w800,
-            color: AppColors.textOnPrimary,
-            letterSpacing: -1,
-          ),
-        ),
+      alignment: Alignment.center,
+      child: Text(
+        'P',
+        style: AppText.title
+            .copyWith(fontSize: size * 0.5, color: AppColors.textOnPrimary),
       ),
     );
   }

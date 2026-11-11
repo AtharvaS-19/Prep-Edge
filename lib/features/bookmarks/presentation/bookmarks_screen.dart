@@ -8,8 +8,12 @@ import 'package:exam_prep_app/features/mistakes/providers/mistakes_provider.dart
 import 'package:exam_prep_app/features/practice/models/question.dart';
 import 'package:exam_prep_app/features/subjects/models/subject_model.dart';
 import 'package:exam_prep_app/shared/constants/app_colors.dart';
-import 'package:exam_prep_app/shared/constants/app_radius.dart';
 import 'package:exam_prep_app/shared/constants/app_spacing.dart';
+import 'package:exam_prep_app/shared/constants/app_text.dart';
+import 'package:exam_prep_app/shared/widgets/app_card.dart';
+import 'package:exam_prep_app/shared/widgets/empty_state.dart';
+import 'package:exam_prep_app/shared/widgets/pressable.dart';
+import 'package:exam_prep_app/shared/widgets/section_header.dart';
 
 // ── Data shape ────────────────────────────────────────────────────────────────
 
@@ -63,11 +67,11 @@ Map<SubjectModel, List<_BookmarkEntry>> _resolveBookmarks(
 
 // ── Screen ────────────────────────────────────────────────────────────────────
 
-/// The Bookmarks screen — Phase 5.
+/// The Bookmarks screen.
 ///
 /// Reads [bookmarkProvider] to get bookmarked question IDs, resolves full
-/// [Question] objects across all subjects/chapters, groups them by subject,
-/// and displays them in expandable sections. Empty state when no bookmarks.
+/// [Question] objects across all subjects/chapters, groups them by subject and
+/// shows them in grouped lists. Empty state when no bookmarks.
 class BookmarksScreen extends ConsumerWidget {
   const BookmarksScreen({super.key});
 
@@ -77,14 +81,17 @@ class BookmarksScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        backgroundColor: AppColors.background,
-        title: const Text('Bookmarks'),
-      ),
       body: SafeArea(
-        child: bookmarkedIds.isEmpty
-            ? const _EmptyState()
-            : _BookmarkList(bookmarkedIds: bookmarkedIds),
+        bottom: false,
+        child: Align(
+          alignment: Alignment.topCenter,
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 640),
+            child: bookmarkedIds.isEmpty
+                ? const _EmptyState()
+                : _BookmarkList(bookmarkedIds: bookmarkedIds),
+          ),
+        ),
       ),
     );
   }
@@ -106,62 +113,34 @@ class _BookmarkList extends ConsumerWidget {
       return const _EmptyState();
     }
 
-    return CustomScrollView(
-      slivers: [
-        // ── Header ──────────────────────────────────────────────────────────
-        SliverToBoxAdapter(
-          child: Padding(
+    final count = bookmarkedIds.length;
+    return ListView(
+      padding: const EdgeInsets.only(bottom: AppSpacing.xxl),
+      children: [
+        ScreenHeader(
+          title: 'Saved',
+          subtitle: '$count question${count == 1 ? '' : 's'} saved for revision',
+        ),
+        for (final entry in grouped.entries)
+          Padding(
             padding: const EdgeInsets.fromLTRB(
               AppSpacing.screenHorizontal,
-              AppSpacing.xl,
+              0,
               AppSpacing.screenHorizontal,
-              AppSpacing.lg,
+              AppSpacing.xl,
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'Bookmarks',
-                  style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.textPrimary,
-                    letterSpacing: -0.5,
-                  ),
-                ),
-                const SizedBox(height: AppSpacing.xs),
-                Text(
-                  '${bookmarkedIds.length} question${bookmarkedIds.length == 1 ? '' : 's'} saved',
-                  style: const TextStyle(
-                    fontSize: 14,
-                    color: AppColors.textSecondary,
-                  ),
+                _SubjectHeader(subject: entry.key, count: entry.value.length),
+                AppGroup(
+                  children: [
+                    for (final e in entry.value) _BookmarkRow(entry: e),
+                  ],
                 ),
               ],
             ),
           ),
-        ),
-
-        // ── Subject groups ────────────────────────────────────────────────
-        for (final entry in grouped.entries) ...[
-          SliverToBoxAdapter(
-            child: _SubjectHeader(subject: entry.key),
-          ),
-          SliverList(
-            delegate: SliverChildBuilderDelegate(
-              (context, i) => _BookmarkTile(entry: entry.value[i]),
-              childCount: entry.value.length,
-            ),
-          ),
-          const SliverToBoxAdapter(
-            child: SizedBox(height: AppSpacing.lg),
-          ),
-        ],
-
-        // ── Bottom padding ───────────────────────────────────────────────
-        const SliverToBoxAdapter(
-          child: SizedBox(height: AppSpacing.xxl),
-        ),
       ],
     );
   }
@@ -170,181 +149,81 @@ class _BookmarkList extends ConsumerWidget {
 // ── Subject section header ────────────────────────────────────────────────────
 
 class _SubjectHeader extends StatelessWidget {
-  const _SubjectHeader({required this.subject});
+  const _SubjectHeader({required this.subject, required this.count});
 
   final SubjectModel subject;
+  final int count;
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(
-        AppSpacing.screenHorizontal,
-        0,
-        AppSpacing.screenHorizontal,
-        AppSpacing.xs,
-      ),
+      padding: const EdgeInsets.only(bottom: AppSpacing.sm),
       child: Row(
         children: [
-          Container(
-            width: 28,
-            height: 28,
-            decoration: BoxDecoration(
-              color: subject.accentColor.withValues(alpha: 0.12),
-              borderRadius: AppRadius.radiusSm,
-            ),
-            child: Icon(
-              subject.icon,
-              size: 14,
-              color: subject.accentColor,
-            ),
-          ),
+          Icon(subject.icon, size: 18, color: subject.accentColor),
           const SizedBox(width: AppSpacing.xs),
-          Text(
-            subject.name,
-            style: TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w600,
-              color: subject.accentColor,
-              letterSpacing: 0.1,
+          Expanded(
+            child: Text(
+              '${subject.name} · ${subject.stream.label}',
+              style: AppText.headline,
             ),
           ),
+          Text('$count', style: AppText.caption),
         ],
       ),
     );
   }
 }
 
-// ── Bookmark tile ─────────────────────────────────────────────────────────────
+// ── Bookmark row ──────────────────────────────────────────────────────────────
 
-class _BookmarkTile extends ConsumerWidget {
-  const _BookmarkTile({required this.entry});
+class _BookmarkRow extends ConsumerWidget {
+  const _BookmarkRow({required this.entry});
 
   final _BookmarkEntry entry;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(
-        AppSpacing.screenHorizontal,
-        0,
-        AppSpacing.screenHorizontal,
-        AppSpacing.cardGap,
-      ),
-      child: GestureDetector(
-        onTap: () {
-          ref.read(initialQuestionIdProvider.notifier).state =
-              entry.question.id;
-          context.push(
-            '/subjects/${entry.subjectId}/chapters/${entry.chapterId}/practice',
-          );
-        },
-        behavior: HitTestBehavior.opaque,
-        child: Container(
-          padding: const EdgeInsets.all(AppSpacing.cardPadding),
-          decoration: BoxDecoration(
-            color: AppColors.cardBackground,
-            borderRadius: AppRadius.radiusXl,
-            border: Border.all(color: AppColors.border, width: 0.75),
-            boxShadow: const [
-              BoxShadow(
-                color: Color(0x08000000),
-                blurRadius: 10,
-                offset: Offset(0, 3),
-                spreadRadius: 0,
-              ),
-            ],
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Chapter label
-              Row(
-                children: [
-                  const Icon(
-                    Icons.bookmark_rounded,
-                    size: 12,
-                    color: AppColors.primary,
-                  ),
-                  const SizedBox(width: 4),
-                  Expanded(
-                    child: Text(
-                      entry.chapterTitle,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w500,
-                        color: AppColors.primary,
-                        letterSpacing: 0.1,
-                      ),
-                    ),
-                  ),
-                  // Source + year tag
-                  _SourceTag(entry: entry),
-                ],
-              ),
-              const SizedBox(height: AppSpacing.xs),
-              // Question text (truncated — tap to read in full)
-              Text(
-                entry.question.text,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                  color: AppColors.textPrimary,
-                  height: 1.5,
-                  letterSpacing: -0.1,
-                ),
-              ),
-              const SizedBox(height: AppSpacing.xs),
-              const Row(
+    return Pressable(
+      scale: 1,
+      onTap: () {
+        ref.read(initialQuestionIdProvider.notifier).state = entry.question.id;
+        context.push(
+          '/subjects/${entry.subjectId}/chapters/${entry.chapterId}/practice',
+        );
+      },
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpacing.md),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Tap to practice',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: AppColors.textTertiary,
-                    ),
+                    entry.question.text,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: AppText.callout.copyWith(height: 1.5),
                   ),
-                  SizedBox(width: 4),
-                  Icon(
-                    Icons.arrow_forward_rounded,
-                    size: 12,
-                    color: AppColors.textTertiary,
+                  const SizedBox(height: 6),
+                  Text(
+                    '${entry.chapterTitle}  ·  ${entry.question.source.label} ${entry.question.year}',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: AppText.caption,
                   ),
                 ],
               ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-// ── Source tag chip ───────────────────────────────────────────────────────────
-
-class _SourceTag extends StatelessWidget {
-  const _SourceTag({required this.entry});
-
-  final _BookmarkEntry entry;
-
-  @override
-  Widget build(BuildContext context) {
-    final label = '${entry.question.source.label} · ${entry.question.year}';
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-      decoration: const BoxDecoration(
-        color: AppColors.cardBackgroundAlt,
-        borderRadius: AppRadius.radiusXs,
-      ),
-      child: Text(
-        label,
-        style: const TextStyle(
-          fontSize: 10,
-          fontWeight: FontWeight.w500,
-          color: AppColors.textSecondary,
+            ),
+            const SizedBox(width: AppSpacing.sm),
+            const Padding(
+              padding: EdgeInsets.only(top: 1),
+              child: Icon(Icons.chevron_right_rounded,
+                  size: 20, color: AppColors.iconSecondary),
+            ),
+          ],
         ),
       ),
     );
@@ -358,77 +237,19 @@ class _EmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding:
-          const EdgeInsets.symmetric(horizontal: AppSpacing.screenHorizontal),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Padding(
-            padding: EdgeInsets.only(top: AppSpacing.xl, bottom: AppSpacing.xs),
-            child: Text(
-              'Bookmarks',
-              style: TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.w700,
-                color: AppColors.textPrimary,
-                letterSpacing: -0.5,
-              ),
-            ),
+    return const Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        ScreenHeader(title: 'Saved'),
+        Expanded(
+          child: EmptyState(
+            icon: Icons.bookmark_outline_rounded,
+            title: 'Nothing saved yet',
+            message:
+                'Tap the bookmark while solving a question to keep it here for revision.',
           ),
-          const Text(
-            'Questions you save will appear here for quick revision.',
-            style: TextStyle(
-              fontSize: 14,
-              color: AppColors.textSecondary,
-              height: 1.5,
-            ),
-          ),
-          const Spacer(),
-          Center(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  width: 56,
-                  height: 56,
-                  decoration: BoxDecoration(
-                    color: AppColors.cardBackground,
-                    borderRadius: AppRadius.radiusLg,
-                    border: Border.all(color: AppColors.border),
-                  ),
-                  child: const Icon(
-                    Icons.bookmark_outline_rounded,
-                    size: 24,
-                    color: AppColors.iconSecondary,
-                  ),
-                ),
-                const SizedBox(height: AppSpacing.md),
-                const Text(
-                  'No bookmarks yet',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.textPrimary,
-                    letterSpacing: -0.25,
-                  ),
-                ),
-                const SizedBox(height: AppSpacing.xs),
-                const Text(
-                  'While solving questions, tap the bookmark\nicon to save important ones here.',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: AppColors.textSecondary,
-                    height: 1.5,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const Spacer(),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }

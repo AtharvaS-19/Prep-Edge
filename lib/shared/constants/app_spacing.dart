@@ -30,15 +30,15 @@ abstract final class AppSpacing {
 
   /// Gap between cards in a grid or list.
   /// Slightly more generous for the floating card aesthetic.
-  static const double cardGap = md; // 16 (was 12)
+  static const double cardGap = sm; // 12
 
   /// Inner padding of a card.
   /// Comfortable padding for the premium card feel.
-  static const double cardPadding = xl; // 24 (was 16)
+  static const double cardPadding = md; // 16
 
   /// Height of the primary action button.
   /// Slightly taller for a more premium feel.
-  static const double buttonHeight = 58.0; // was 56
+  static const double buttonHeight = 52.0;
 
   /// Height of secondary / outline button.
   static const double buttonHeightSm = 46.0; // was 44

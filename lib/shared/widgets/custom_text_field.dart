@@ -2,14 +2,12 @@ import 'package:flutter/material.dart';
 import '../constants/app_colors.dart';
 import '../constants/app_radius.dart';
 import '../constants/app_spacing.dart';
+import '../constants/app_text.dart';
 
 /// A reusable, styled text field that wraps [TextFormField].
 ///
-/// Supports all standard use-cases:
-/// - Password fields ([obscureText])
-/// - Email / number keyboards ([keyboardType])
-/// - Leading / trailing icons ([prefixIcon], [suffixIcon])
-/// - Optional label above the field ([labelText])
+/// Supports password fields ([obscureText]), keyboard types, leading and
+/// trailing icons, and an optional label above the field.
 class CustomTextField extends StatefulWidget {
   const CustomTextField({
     super.key,
@@ -62,15 +60,9 @@ class _CustomTextFieldState extends State<CustomTextField> {
         if (widget.labelText != null) ...[
           Text(
             widget.labelText!,
-            style: const TextStyle(
-              fontFamily: 'Inter',
-              fontSize: 13,
-              fontWeight: FontWeight.w600,
-              color: AppColors.textPrimary,
-              letterSpacing: -0.1,
-            ),
+            style: AppText.captionStrong.copyWith(color: AppColors.textPrimary),
           ),
-          const SizedBox(height: AppSpacing.xs),
+          const SizedBox(height: 6),
         ],
         TextFormField(
           controller: widget.controller,
@@ -81,80 +73,55 @@ class _CustomTextFieldState extends State<CustomTextField> {
           focusNode: widget.focusNode,
           readOnly: widget.readOnly,
           onTap: widget.onTap,
-          style: const TextStyle(
-            fontFamily: 'Inter',
-            fontSize: 15,
-            fontWeight: FontWeight.w400,
-            color: AppColors.textPrimary,
-            height: 1.5,
-          ),
+          cursorColor: AppColors.primary,
+          style: AppText.body,
           decoration: InputDecoration(
             hintText: widget.hintText,
-            hintStyle: const TextStyle(
-              fontFamily: 'Inter',
-              fontSize: 15,
-              fontWeight: FontWeight.w400,
-              color: AppColors.textTertiary,
-            ),
+            hintStyle: AppText.body.copyWith(color: AppColors.textTertiary),
             prefixIcon: widget.prefixIcon != null
                 ? Padding(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
-                    child: Icon(
-                      widget.prefixIcon,
-                      size: 18,
-                      color: AppColors.iconSecondary,
-                    ),
+                    padding: const EdgeInsets.only(
+                        left: AppSpacing.md, right: AppSpacing.sm),
+                    child: Icon(widget.prefixIcon,
+                        size: 19, color: AppColors.iconSecondary),
                   )
                 : null,
             prefixIconConstraints:
-                const BoxConstraints(minWidth: 44, minHeight: 48),
+                const BoxConstraints(minWidth: 0, minHeight: 0),
             suffixIcon: widget.obscureText
                 ? _PasswordToggle(
                     isObscured: _obscured,
                     onToggle: () => setState(() => _obscured = !_obscured),
                   )
                 : widget.suffixIcon,
+            suffixIconConstraints:
+                const BoxConstraints(minWidth: 0, minHeight: 0),
             filled: true,
             fillColor: AppColors.cardBackground,
-            // Improved padding for premium appearance
             contentPadding: const EdgeInsets.symmetric(
               horizontal: AppSpacing.md,
-              vertical: AppSpacing.xl,
+              vertical: 15,
             ),
-            border: const OutlineInputBorder(
-              borderRadius: AppRadius.radiusLg,
-              borderSide: BorderSide(color: AppColors.border, width: 1),
-            ),
-            enabledBorder: const OutlineInputBorder(
-              borderRadius: AppRadius.radiusLg,
-              borderSide: BorderSide(color: AppColors.border, width: 1),
-            ),
-            focusedBorder: const OutlineInputBorder(
-              borderRadius: AppRadius.radiusLg,
-              borderSide: BorderSide(color: AppColors.borderFocused, width: 2),
-            ),
-            errorBorder: const OutlineInputBorder(
-              borderRadius: AppRadius.radiusLg,
-              borderSide: BorderSide(color: AppColors.error, width: 1),
-            ),
-            focusedErrorBorder: const OutlineInputBorder(
-              borderRadius: AppRadius.radiusLg,
-              borderSide: BorderSide(color: AppColors.error, width: 2),
-            ),
+            border: _border(AppColors.border),
+            enabledBorder: _border(AppColors.border),
+            focusedBorder: _border(AppColors.borderFocused, width: 1.5),
+            errorBorder: _border(AppColors.error),
+            focusedErrorBorder: _border(AppColors.error, width: 1.5),
           ),
         ),
       ],
     );
   }
+
+  static OutlineInputBorder _border(Color c, {double width = 1}) =>
+      OutlineInputBorder(
+        borderRadius: AppRadius.radiusLg,
+        borderSide: BorderSide(color: c, width: width),
+      );
 }
 
-/// Internal widget — shows a visibility toggle for password fields.
 class _PasswordToggle extends StatelessWidget {
-  const _PasswordToggle({
-    required this.isObscured,
-    required this.onToggle,
-  });
+  const _PasswordToggle({required this.isObscured, required this.onToggle});
 
   final bool isObscured;
   final VoidCallback onToggle;
@@ -163,13 +130,14 @@ class _PasswordToggle extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onToggle,
+      behavior: HitTestBehavior.opaque,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
+        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
         child: Icon(
           isObscured
               ? Icons.visibility_off_outlined
               : Icons.visibility_outlined,
-          size: 18,
+          size: 19,
           color: AppColors.iconSecondary,
         ),
       ),

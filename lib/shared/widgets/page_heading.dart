@@ -25,7 +25,6 @@ class PageHeading extends StatelessWidget {
         Text(
           title,
           style: const TextStyle(
-            fontFamily: 'Inter',
             fontSize: 30,
             fontWeight: FontWeight.w700,
             color: AppColors.textPrimary,
@@ -38,7 +37,6 @@ class PageHeading extends StatelessWidget {
           Text(
             subtitle!,
             style: const TextStyle(
-              fontFamily: 'Inter',
               fontSize: 16,
               fontWeight: FontWeight.w400,
               color: AppColors.textSecondary,

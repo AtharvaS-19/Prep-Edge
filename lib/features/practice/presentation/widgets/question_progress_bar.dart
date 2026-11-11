@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import '../../../../shared/constants/app_colors.dart';
 import '../../../../shared/constants/app_spacing.dart';
+import '../../../../shared/constants/app_text.dart';
+import '../../../../shared/widgets/app_progress_bar.dart';
 
-/// Top progress bar shown on the practice screen.
-///
-/// Displays "Q 3 of 20", a linear progress indicator,
-/// and the exam source tag on the right.
+/// Top progress strip shown on the practice screen: "Question 3 of 20", the
+/// exam source on the right and a slim progress bar beneath.
 class QuestionProgressBar extends StatelessWidget {
   const QuestionProgressBar({
     super.key,
@@ -24,69 +24,36 @@ class QuestionProgressBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    const tabular = [FontFeature.tabularFigures()];
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           children: [
-            Text(
-              'Q ${currentIndex + 1}',
-              style: const TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w700,
-                color: AppColors.textPrimary,
-                letterSpacing: -0.2,
-              ),
-            ),
-            Text(
-              ' of $total',
-              style: const TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w400,
-                color: AppColors.textTertiary,
+            Text.rich(
+              TextSpan(
+                text: 'Question ${currentIndex + 1}',
+                style: AppText.callout
+                    .copyWith(fontWeight: FontWeight.w600, fontFeatures: tabular),
+                children: [
+                  TextSpan(
+                    text: ' of $total',
+                    style: AppText.callout.copyWith(
+                      color: AppColors.textTertiary,
+                      fontWeight: FontWeight.w400,
+                      fontFeatures: tabular,
+                    ),
+                  ),
+                ],
               ),
             ),
             const Spacer(),
-            _SourceTag(label: sourceLabel, year: year),
+            Text('$sourceLabel · $year', style: AppText.caption),
           ],
         ),
-        const SizedBox(height: AppSpacing.xs),
-        ClipRRect(
-          borderRadius: const BorderRadius.all(Radius.circular(999)),
-          child: LinearProgressIndicator(
-            value: _progress,
-            minHeight: 4,
-            backgroundColor: AppColors.progressTrack,
-            valueColor: const AlwaysStoppedAnimation<Color>(AppColors.primary),
-          ),
-        ),
+        const SizedBox(height: AppSpacing.sm),
+        AppProgressBar(value: _progress, height: 4),
       ],
-    );
-  }
-}
-
-class _SourceTag extends StatelessWidget {
-  const _SourceTag({required this.label, required this.year});
-  final String label;
-  final int year;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-      decoration: BoxDecoration(
-        color: AppColors.primaryLight,
-        borderRadius: BorderRadius.circular(5),
-      ),
-      child: Text(
-        '$label · $year',
-        style: const TextStyle(
-          fontSize: 10,
-          fontWeight: FontWeight.w600,
-          color: AppColors.primary,
-          letterSpacing: 0.1,
-        ),
-      ),
     );
   }
 }
