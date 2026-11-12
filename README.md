@@ -1,4 +1,4 @@
-# exam_prep_app
+# Prep-Edge
 
 A new Flutter project.
 
